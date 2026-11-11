@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1677ff">
+<title>CaloriAI Premium</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#fff;padding:20px;text-align:center;border-bottom:1px solid #e2e8f0}
+header h1{margin:0;color:#1677ff}
+main{max-width:600px;margin:auto;padding:18px}
+.card{background:#fff;padding:18px;border-radius:18px;margin-bottom:16px;box-shadow:0 4px 18px #15284a0c}
+label{display:block;margin:12px 0 6px;font-weight:bold}
+input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #d6deea;font-size:16px}
+button{background:#1677ff;color:white;border:0;font-weight:bold;margin-top:12px;cursor:pointer}
+.secondary{background:#e8f1ff;color:#145dcc}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:#edf4ff;padding:14px;border-radius:12px}
+.stat strong{display:block;font-size:24px;color:#1677ff;margin-top:8px}
+small{color:#68758a}
+li{padding:8px 0;border-bottom:1px solid #edf0f5}
+</style>
+</head>
+<body>
+<header>
+<h1>🥗 CaloriAI Premium</h1>
+<p id="subtitle">Votre nutrition, en toute simplicité</p>
+<select id="language" onchange="changeLanguage()" aria-label="Language">
+<option value="fr">Français</option>
+<option value="ar">العربية</option>
+<option value="en">English</option>
+</select>
+</header>
+<main>
+<section class="card">
+<h2 id="welcome">Suivi nutritionnel quotidien</h2>
+<div class="stats">
+<div class="stat"><span id="calLabel">Calories consommées</span><strong id="total">0</strong><small>kcal</small></div>
+<div class="stat"><span id="mealLabel">Nombre de repas</span><strong id="count">0</strong></div>
+</div>
+</section>
+<section class="card">
+<h2 id="addTitle">Ajouter un aliment</h2>
+<label id="foodLabel" for="food">Nom de l'aliment</label>
+<input id="food" placeholder="Ex. : pomme">
+<label id="quantityLabel" for="quantity">Calories (kcal)</label>
+<input id="quantity" type="number" min="0" step="1" placeholder="Ex. : 95">
+<button onclick="addFood()" id="addButton">Ajouter à mon journal</button>
+<p><small id="notice">Les valeurs sont saisies manuellement dans cette version de démonstration.</small></p>
+</section>
+<section class="card">
+<h2 id="journalTitle">Mon journal alimentaire</h2>
+<ul id="journal"></ul>
+<button class="secondary" onclick="clearJournal()" id="clearButton">Effacer le journal</button>
+</section>
+<section class="card">
+<h2 id="premiumTitle">✨ CaloriAI Premium</h2>
+<p id="premiumText">Préparez votre suivi nutritionnel et découvrez les prochaines fonctionnalités.</p>
+<small id="premiumNote">Cette maquette ne réalise pas encore l'analyse automatique des photos ni les paiements.</small>
+</section>
+</main>
+<script>
+const translations={
+fr:{subtitle:"Votre nutrition, en toute simplicité",welcome:"Suivi nutritionnel quotidien",cal:"Calories consommées",meals:"Nombre de repas",add:"Ajouter un aliment",food:"Nom de l'aliment",placeholder:"Ex. : pomme",quantity:"Calories (kcal)",addButton:"Ajouter à mon journal",notice:"Les valeurs sont saisies manuellement dans cette version de démonstration.",journal:"Mon journal alimentaire",clear:"Effacer le journal",premium:"✨ CaloriAI Premium",premiumText:"Préparez votre suivi nutritionnel et découvrez les prochaines fonctionnalités.",premiumNote:"Cette maquette ne réalise pas encore l'analyse automatique des photos ni les paiements.",empty:"Aucun aliment enregistré.",invalid:"Saisissez un aliment et un nombre de calories valide.",confirm:"Effacer tout le journal ?"},
+ar:{subtitle:"تغذيتك بكل بساطة",welcome:"متابعة التغذية اليومية",cal:"السعرات المستهلكة",meals:"عدد الوجبات",add:"إضافة طعام",food:"اسم الطعام",placeholder:"مثال: تفاحة",quantity:"السعرات الحرارية",addButton:"أضف إلى سجلي",notice:"يتم إدخال القيم يدوياً في هذه النسخة التجريبية.",journal:"سجلي الغذائي",clear:"مسح السجل",premium:"✨ كالوري AI بريميوم",premiumText:"استعد لمتابعة تغذيتك واكتشاف الميزات القادمة.",premiumNote:"هذه نسخة تجريبية ولا تتضمن بعد تحليل الصور تلقائياً أو الدفع.",empty:"لم يتم تسجيل أي طعام.",invalid:"أدخل اسم الطعام وعدداً صحيحاً من السعرات.",confirm:"هل تريد مسح السجل بالكامل؟"},
+en:{subtitle:"Nutrition made simple",welcome:"Daily nutrition tracking",cal:"Calories consumed",meals:"Number of meals",add:"Add a food",food:"Food name",placeholder:"e.g. apple",quantity:"Calories (kcal)",addButton:"Add to my journal",notice:"Values are entered manually in this demo version.",journal:"My food journal",clear:"Clear journal",premium:"✨ CaloriAI Premium",premiumText:"Get ready to track your nutrition and explore upcoming features.",premiumNote:"This demo does not yet include automatic photo analysis or payments.",empty:"No food recorded.",invalid:"Enter a food name and a valid calorie amount.",confirm:"Clear the entire journal?"}
+};
+let journal=[];
+try{journal=JSON.parse(localStorage.getItem("caloriai_journal")||"[]");if(!Array.isArray(journal))journal=[]}catch(e){journal=[]}
+function changeLanguage(){
+const lang=document.getElementById("language").value,t=translations[lang];
+document.documentElement.lang=lang;
+document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+const ids={subtitle:"subtitle",welcome:"welcome",cal:"calLabel",meals:"mealLabel",add:"addTitle",food:"foodLabel",quantity:"quantityLabel",addButton:"addButton",notice:"notice",journal:"journalTitle",clear:"clearButton",premium:"premiumTitle",premiumText:"premiumText",premiumNote:"premiumNote"};
+Object.entries(ids).forEach(([key,id])=>document.getElementById(id).textContent=t[key]);
+document.getElementById("food").placeholder=t.placeholder;
+render();
+}
+function addFood(){
+const lang=document.getElementById("language").value,t=translations[lang];
+const food=document.getElementById("food").value.trim();
+const calories=Number(document.getElementById("quantity").value);
+if(!food||document.getElementById("quantity").value.trim()===""||!Number.isFinite(calories)||calories<0){alert(t.invalid);return}
+journal.push({food,calories});
+try{localStorage.setItem("caloriai_journal",JSON.stringify(journal))}catch(e){alert("Storage unavailable")}
+document.getElementById("food").value="";
+document.getElementById("quantity").value="";
+render();
+}
+function render(){
+const lang=document.getElementById("language").value,t=translations[lang];
+document.getElementById("total").textContent=journal.reduce((s,x)=>s+x.calories,0).toLocaleString();
+document.getElementById("count").textContent=journal.length;
+const list=document.getElementById("journal");list.replaceChildren();
+if(!journal.length){const li=document.createElement("li");li.textContent=t.empty;list.appendChild(li);return}
+journal.forEach(item=>{const li=document.createElement("li");li.textContent=item.food+" — "+item.calories+" kcal";list.appendChild(li)});
+}
+function clearJournal(){
+const lang=document.getElementById("language").value;
+if(!confirm(translations[lang].confirm))return;
+journal=[];
+try{localStorage.removeItem("caloriai_journal")}catch(e){}
+render();
+}
+changeLanguage();
+</script>
+</body>
+</html>
