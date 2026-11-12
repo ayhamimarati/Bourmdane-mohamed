@@ -1,647 +1,128 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#1677ff">
-<title>CaloriAI Premium</title>
-
+ate(); <!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2878ff"><title>CaloriAI Premium</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f3f6fc;color:#172033;font-family:Arial,sans-serif}
-header{text-align:center;background:white;padding:18px}
-h1{color:#1677ff}
-main{max-width:700px;margin:auto;padding:14px}
-.card{background:white;padding:18px;border-radius:18px;margin-bottom:16px;box-shadow:0 3px 12px #00000008}
-button,input,select{width:100%;padding:13px;border-radius:11px;font-size:16px}
-button{border:0;background:#1677ff;color:white;font-weight:bold;margin-top:10px;cursor:pointer}
-button:disabled{opacity:.6}
-.secondary{background:#e8f1ff;color:#145dcc}
-.danger{background:#fff0f0;color:#b42318}
-input,select{border:1px solid #dce3ed;background:white}
-label{display:block;margin:12px 0 6px;font-weight:bold}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat{background:#edf4ff;padding:15px;border-radius:14px}
-.stat strong{display:block;color:#1677ff;font-size:26px;margin-top:8px}
-.muted{color:#68758a;line-height:1.6}
-.photo-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.photo-buttons button{min-height:58px}
-#photoPreview{display:none;width:100%;max-height:330px;object-fit:contain;margin-top:14px;border-radius:12px;background:#eee}
-.result{border:1px solid #e1e6ef;padding:12px;border-radius:12px;margin-top:12px}
-.food-name{font-weight:bold;margin-bottom:8px}
-#photoStatus{overflow-wrap:anywhere}
-[dir=rtl]{text-align:right}
-</style>
-</head>
+*{box-sizing:border-box}html{background:#1e2225}body{margin:0;font-family:Arial,sans-serif;background:#1e2225;color:#edf2fb;min-height:100vh}header{background:linear-gradient(120deg,#2874f5,#4d8cff);padding:25px 18px 28px;text-align:left;border-radius:0 0 38px 38px;color:white}header h1{color:white;font-size:clamp(27px,6vw,38px);margin:12px 0}header p{font-size:18px;color:#e5edff;margin:10px 0 24px}header select{max-width:230px;background:#3676dc;color:white;border:1px solid #5b91e8;float:right;margin-top:-64px}main{max-width:760px;margin:auto;padding:22px 16px 30px}.card{background:#202327;padding:20px;border-radius:25px;margin-bottom:18px;border:1px solid #41454b;box-shadow:0 4px 18px #0002}h2{font-size:23px;margin:0 0 15px;color:#f0f4fb}label{display:block;margin:13px 0 7px;font-weight:bold;color:#dce4f2}input,select,button{width:100%;padding:14px;border-radius:14px;border:1px solid #424750;background:#17191c;color:#f3f6fc;font-size:16px}input::placeholder{color:#8d96a8}button{background:#3478f6;color:white;border:0;font-weight:bold;margin-top:12px;cursor:pointer}.secondary{background:#303b50;color:#a9c2ff;border:1px solid #49556c}.danger{background:#4a2528;color:#ff9da3}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:#191b1e;padding:16px;border-radius:16px;border:1px solid #393d43}.stat strong{display:block;font-size:30px;color:#7da2ff;margin-top:8px}.muted,small{color:#929bad;line-height:1.5}li{padding:12px 0;border-bottom:1px solid #3a3e44;list-style:none}ul{padding:0}.food-title{font-weight:bold;color:#edf2fb}.food-detail{font-size:14px;color:#929bad;margin:4px 0}.notice{background:#302b20;border-radius:12px;padding:12px;color:#f1d28b}.photo-preview{display:none;width:100%;max-height:320px;object-fit:contain;border-radius:14px;margin-top:12px;background:#17191c}.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.photo-actions button{margin-top:8px;min-height:54px}.photo-status{margin-top:10px;font-size:14px;color:#a0a9b9;line-height:1.5}footer{color:#858d9c!important}[dir=rtl]{text-align:right}#language{float:none;margin-top:4px;display:block}header:after{content:"";display:block;clear:both}@media(max-width:420px){main{padding:18px 12px}.card{padding:16px}header{padding:22px 18px 26px}header select{margin-top:0;float:none}header p{margin-bottom:20px}.photo-actions{gap:8px}.photo-actions button{font-size:14px;padding:12px 8px}}
 
-<body>
-
-<header>
-<h1>🥗 CaloriAI Premium</h1>
-<p id="subtitle">Votre nutrition, en toute simplicité</p>
-<select id="language" aria-label="Language">
-<option value="fr">Français</option>
-<option value="ar">العربية</option>
-<option value="en">English</option>
-</select>
-</header>
-
+.day-heading{display:flex;align-items:center;justify-content:space-between;margin:42px 4px 18px}.day-heading h2{margin:0}.day-heading span{font-size:14px;color:#929bad}.goal-card{background:linear-gradient(145deg,#202327,#1b1d20);padding:24px 22px}.goal-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.cal-number{display:flex;align-items:baseline;gap:7px;margin-top:4px}.cal-number strong{font-size:56px;line-height:1.1;color:#f3f6fc}.cal-number small{font-size:17px}.remaining{background:#202b42;color:#7da2ff;padding:12px 14px;border-radius:30px;font-size:14px;text-align:center}.progress-track{height:10px;background:#2b3036;border-radius:20px;margin:28px 0 15px;overflow:hidden}.progress-track div{height:100%;width:0;background:#397cff;border-radius:20px;transition:width .25s}.goal-bottom{display:flex;justify-content:space-between;align-items:center;color:#929bad;gap:10px}.small-button{width:auto;margin:0;padding:10px 18px}.macro-stats{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:24px}.macro-stats .stat{padding:14px 12px}.macro-stats .stat span{color:#929bad;font-size:14px}.macro-stats .stat strong{font-size:25px;color:#f0f4fb}.quick-section{margin:26px 0 32px}.quick-section h2{margin:0 4px 16px}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.quick-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-height:165px;padding:22px;background:#202327;border:1px solid #41454b;border-radius:25px;margin:0;gap:8px}.quick-card span{font-size:34px}.quick-card strong{font-size:21px;color:#f0f4fb}.quick-card small{font-size:15px;font-weight:normal;color:#929bad}.bottom-nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:#111315;border-top:1px solid #41454b;padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:10}.bottom-nav button{border:0;background:transparent;color:#818999;margin:0;padding:7px 2px;display:flex;flex-direction:column;align-items:center;gap:4px}.bottom-nav button span{font-size:27px;line-height:1.1}.bottom-nav button small{font-size:12px;font-weight:bold}.bottom-nav button.active{color:#7198ff}#profileCard{scroll-margin-top:15px}#photoCard,#journalCard{scroll-margin-top:15px}
+</style></head><body>
+<header><h1>🥗 CaloriAI Premium</h1><p id="subtitle"></p><select id="language" aria-label="Language"><option value="fr">Français</option><option value="ar">العربية</option><option value="en">English</option></select></header>
 <main>
-
-<section class="card">
-<h2 id="welcome">Suivi nutritionnel quotidien</h2>
-<div class="stats">
-<div class="stat">
-<span id="calLabel">Calories consommées</span>
-<strong id="total">0</strong>
-</div>
-<div class="stat">
-<span id="mealLabel">Nombre d'aliments</span>
-<strong id="count">0</strong>
-</div>
-</div>
-</section>
-
-<section class="card">
+<section class="day-heading"><h2 id="welcome"></h2><span id="goalHeading">Objectif quotidien</span></section>
+<section class="card goal-card"><div class="goal-top"><div><span id="calLabel" class="muted"></span><div class="cal-number"><strong id="total">0</strong> <small>kcal</small></div></div><span class="remaining" id="remaining">2 000 kcal restantes</span></div><div class="progress-track"><div id="progressBar"></div></div><div class="goal-bottom"><span id="goalText">Objectif : 2 000 kcal</span><button type="button" id="goalEdit" class="secondary small-button">Modifier</button></div><div class="stats macro-stats"><div class="stat"><span>🔵 <span id="proteinLabel">Protéines</span></span><strong id="proteinTotal">0 g</strong></div><div class="stat"><span>🟢 <span id="carbLabel">Glucides</span></span><strong id="carbTotal">0 g</strong></div><div class="stat"><span>🟠 <span id="fatLabel">Lipides</span></span><strong id="fatTotal">0 g</strong></div></div></section>
+<section class="quick-section"><h2 id="quickTitle">Actions rapides</h2><div class="quick-grid"><button type="button" id="quickMeal" class="quick-card"><span>📸</span><strong id="quickMealTitle">Ajouter un repas</strong><small id="quickMealText">Photo ou saisie manuelle</small></button><button type="button" id="quickWeight" class="quick-card"><span>⚖️</span><strong id="quickWeightTitle">Suivre mon poids</strong><small id="quickWeightText">Historique personnel</small></button></div></section>
+<section class="card" id="photoCard">
 <h2 id="photoTitle">📸 Photographier un repas</h2>
-<p id="photoDescription" class="muted">
-Choisissez une image dans la galerie ou prenez une photo.
-</p>
-
-<!-- زر اختيار الصورة من المعرض -->
-<div class="photo-buttons">
-<button type="button" id="galleryButton">
-🖼️ Choisir dans la galerie
-</button>
-
-<button type="button" id="cameraButton">
-📷 Prendre une photo
-</button>
+<p id="photoDescription" class="muted">Prenez une photo de votre plat ou choisissez une image dans votre galerie.</p>
+<label id="photoLabel">Photo du repas</label>
+<div class="photo-actions">
+<button type="button" id="galleryButton">🖼️ Choisir dans la galerie</button>
+<button type="button" id="cameraButton">📷 Prendre une photo</button>
 </div>
-
-<!-- مهم: حقل المعرض لا يحتوي على capture -->
-<input
-  id="foodPhoto"
-  type="file"
-  accept="image/*"
-  style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-  aria-label="Choisir une image dans la galerie"
->
-
-<!-- حقل الكاميرا مستقل -->
-<input
-  id="cameraPhoto"
-  type="file"
-  accept="image/*"
-  capture="environment"
-  style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-  aria-label="Prendre une photo"
->
-
-<img id="photoPreview" alt="Aperçu de la photo">
-
-<p id="photoStatus" class="muted" aria-live="polite"></p>
-
-<button type="button" id="analyzeButton">
-🔍 Analyser la photo
-</button>
-
-<button type="button" class="secondary" id="removePhotoButton">
-Retirer la photo
-</button>
-
-<div id="analysisResults"></div>
+<input id="foodPhoto" type="file" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1">
+<input id="cameraPhoto" type="file" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1">
+<img id="photoPreview" class="photo-preview" alt="Aperçu de la photo du repas">
+<div class="photo-actions">
+<button type="button" id="analyzePhotoButton">Analyser la photo</button>
+<button type="button" class="secondary" id="removePhotoButton">Retirer la photo</button>
+</div>
+<p id="photoStatus" class="photo-status">Choisissez une photo puis lancez l’analyse.</p>
+<div id="analysisResults" style="display:none;margin-top:14px"></div>
 </section>
-
-<section class="card">
-<h2 id="addTitle">Ajouter un aliment</h2>
-
-<label id="foodLabel" for="foodName">Nom de l'aliment</label>
-<input id="foodName" list="foodOptions" placeholder="Ex. : pomme">
-
-<datalist id="foodOptions"></datalist>
-
-<label id="gramsLabel" for="grams">Quantité (g)</label>
-<input id="grams" type="number" min="1" value="100">
-
-<label id="caloriesLabel" for="calories100">kcal pour 100 g</label>
-<input id="calories100" type="number" min="0" placeholder="52">
-
-<button type="button" id="addButton">Ajouter à mon journal</button>
-
-<p id="manualNote" class="muted">
-Les valeurs nutritionnelles sont des estimations.
-</p>
-</section>
-
-<section class="card">
-<h2 id="journalTitle">Mon journal alimentaire</h2>
-<p id="emptyMessage" class="muted">Aucun aliment ajouté aujourd'hui.</p>
-<ul id="journal" style="padding:0"></ul>
-<button type="button" class="secondary" id="clearButton">
-Effacer le journal du jour
-</button>
-</section>
-
-<p id="privacyNote" class="muted"></p>
-
-</main>
-
+<section class="card"><h2 id="addTitle"></h2><label id="searchLabel" for="foodSearch"></label><input id="foodSearch" list="foodOptions"><datalist id="foodOptions"></datalist><label id="gramsLabel" for="grams"></label><input id="grams" type="number" min="1" value="100"><label id="cal100Label" for="calories100"></label><input id="calories100" type="number" min="0" placeholder="52"><p id="calcNote" class="muted"></p><button id="addButton"></button><p id="manualNote" class="muted"></p></section>
+<section class="card" id="journalCard"><h2 id="journalTitle"></h2><p id="empty" class="muted"></p><ul id="journal"></ul><button class="secondary" id="clearButton"></button></section>
+<section class="card" id="profileCard"><h2 id="databaseTitle"></h2><p id="databaseNote" class="muted"></p><div id="databaseSummary" class="muted"></div></section><p id="privacyNote" class="notice"></p></main><nav class="bottom-nav"><button type="button" data-target="top" class="active"><span>⌂</span><small id="navHome">Accueil</small></button><button type="button" data-target="photoCard"><span>＋</span><small id="navAdd">Ajouter</small></button><button type="button" data-target="journalCard"><span>⚖</span><small id="navWeight">Poids</small></button><button type="button" data-target="profileCard"><span>⚙</span><small id="navProfile">Profil</small></button></nav><footer style="text-align:center;padding:12px;color:#858d9c">CaloriAI Premium · Demo</footer>
 <script>
-"use strict";
-
-const $ = id => document.getElementById(id);
-
-const translations = {
-fr:{
-subtitle:"Votre nutrition, en toute simplicité",
-welcome:"Suivi nutritionnel quotidien",
-calLabel:"Calories consommées",
-mealLabel:"Nombre d'aliments",
-photoTitle:"📸 Photographier un repas",
-photoDescription:"Choisissez une image dans la galerie ou prenez une photo.",
-gallery:"🖼️ Choisir dans la galerie",
-camera:"📷 Prendre une photo",
-analyze:"🔍 Analyser la photo",
-removePhoto:"Retirer la photo",
-noPhoto:"Aucune photo sélectionnée.",
-photoReady:"Photo sélectionnée. Vous pouvez lancer l'analyse.",
-analyzing:"Analyse en cours…",
-photoRequired:"Choisissez une photo ou prenez-en une.",
-analysisError:"Échec de l'analyse. Vérifiez le service IA.",
-analysisEmpty:"Aucun aliment identifié.",
-addTitle:"Ajouter un aliment",
-foodLabel:"Nom de l'aliment",
-gramsLabel:"Quantité (g)",
-caloriesLabel:"kcal pour 100 g",
-addButton:"Ajouter à mon journal",
-manualNote:"Les valeurs nutritionnelles sont des estimations.",
-journalTitle:"Mon journal alimentaire",
-emptyMessage:"Aucun aliment ajouté aujourd'hui.",
-clearButton:"Effacer le journal du jour",
-privacyNote:"Les aliments enregistrés sont conservés dans le navigateur.",
-remove:"Supprimer",
-addResult:"Ajouter au journal",
-added:"Ajouté",
-quantity:"Quantité (g)",
-totalCalories:"Calories totales",
-kcal:"kcal",
-confirmClear:"Effacer le journal du jour ?",
-invalid:"Vérifiez le nom de l'aliment, la quantité et les calories."
-},
-ar:{
-subtitle:"تغذيتك بكل بساطة",
-welcome:"متابعة التغذية اليومية",
-calLabel:"السعرات المستهلكة",
-mealLabel:"عدد الأطعمة",
-photoTitle:"📸 تصوير الوجبة",
-photoDescription:"اختر صورة من معرض الهاتف أو التقط صورة بالكاميرا.",
-gallery:"🖼️ اختيار صورة من المعرض",
-camera:"📷 التقاط صورة بالكاميرا",
-analyze:"🔍 تحليل الصورة",
-removePhoto:"إزالة الصورة",
-noPhoto:"لم يتم اختيار صورة.",
-photoReady:"تم اختيار الصورة. يمكنك بدء التحليل.",
-analyzing:"جارٍ تحليل الصورة…",
-photoRequired:"اختر صورة أو التقط صورة أولًا.",
-analysisError:"فشل التحليل. تحقق من خدمة الذكاء الاصطناعي.",
-analysisEmpty:"لم يتم التعرف على أي طعام.",
-addTitle:"إضافة طعام",
-foodLabel:"اسم الطعام",
-gramsLabel:"الكمية (غرام)",
-caloriesLabel:"السعرات لكل 100 غرام",
-addButton:"أضف إلى سجلي",
-manualNote:"القيم الغذائية تقديرية.",
-journalTitle:"سجلي الغذائي",
-emptyMessage:"لم تتم إضافة أي طعام اليوم.",
-clearButton:"مسح سجل اليوم",
-privacyNote:"تُحفظ الأطعمة المسجلة في المتصفح على جهازك.",
-remove:"حذف",
-addResult:"إضافة إلى السجل",
-added:"تمت الإضافة",
-quantity:"الكمية (غرام)",
-totalCalories:"مجموع السعرات",
-kcal:"سعرة",
-confirmClear:"هل تريد مسح سجل اليوم؟",
-invalid:"تحقق من اسم الطعام والكمية والسعرات."
-},
-en:{
-subtitle:"Nutrition made simple",
-welcome:"Daily nutrition tracking",
-calLabel:"Calories consumed",
-mealLabel:"Food entries",
-photoTitle:"📸 Photograph a meal",
-photoDescription:"Choose an image from your gallery or take a photo.",
-gallery:"🖼️ Choose from gallery",
-camera:"📷 Take a photo",
-analyze:"🔍 Analyze photo",
-removePhoto:"Remove photo",
-noPhoto:"No photo selected.",
-photoReady:"Photo selected. You can start the analysis.",
-analyzing:"Analyzing image…",
-photoRequired:"Choose or take a photo first.",
-analysisError:"Analysis failed. Check the AI service.",
-analysisEmpty:"No foods identified.",
-addTitle:"Add a food",
-foodLabel:"Food name",
-gramsLabel:"Quantity (g)",
-caloriesLabel:"kcal per 100 g",
-addButton:"Add to my journal",
-manualNote:"Nutrition values are estimates.",
-journalTitle:"My food journal",
-emptyMessage:"No foods added today.",
-clearButton:"Clear today's journal",
-privacyNote:"Saved foods are stored in this browser.",
-remove:"Delete",
-addResult:"Add to journal",
-added:"Added",
-quantity:"Quantity (g)",
-totalCalories:"Total calories",
-kcal:"kcal",
-confirmClear:"Clear today's journal?",
-invalid:"Check the food name, quantity and calories."
+const foods=[
+{fr:"Pomme",ar:"تفاح",en:"Apple",k:52},{fr:"Banane",ar:"موز",en:"Banana",k:89},{fr:"Orange",ar:"برتقال",en:"Orange",k:47},{fr:"Fraise",ar:"فراولة",en:"Strawberry",k:32},{fr:"Datte",ar:"تمر",en:"Date",k:282},{fr:"Avocat",ar:"أفوكادو",en:"Avocado",k:160},{fr:"Riz blanc cuit",ar:"أرز أبيض مطبوخ",en:"Cooked white rice",k:130},{fr:"Pâtes cuites",ar:"معكرونة مطبوخة",en:"Cooked pasta",k:157},{fr:"Pain blanc",ar:"خبز أبيض",en:"White bread",k:266},{fr:"Œuf",ar:"بيض",en:"Egg",k:155},{fr:"Poulet cuit",ar:"دجاج مطبوخ",en:"Cooked chicken",k:165},{fr:"Bœuf cuit",ar:"لحم بقري مطبوخ",en:"Cooked beef",k:250},{fr:"Saumon cuit",ar:"سلمون مطبوخ",en:"Cooked salmon",k:206},{fr:"Lait entier",ar:"حليب كامل الدسم",en:"Whole milk",k:61},{fr:"Yaourt nature",ar:"زبادي طبيعي",en:"Plain yogurt",k:61},{fr:"Amandes",ar:"لوز",en:"Almonds",k:579},{fr:"Avoine sèche",ar:"شوفان جاف",en:"Dry oats",k:389},{fr:"Pomme de terre bouillie",ar:"بطاطس مسلوقة",en:"Boiled potato",k:87},{fr:"Tomate",ar:"طماطم",en:"Tomato",k:18},{fr:"Concombre",ar:"خيار",en:"Cucumber",k:15},{fr:"Carotte",ar:"جزر",en:"Carrot",k:41},{fr:"Lentilles cuites",ar:"عدس مطبوخ",en:"Cooked lentils",k:116},{fr:"Pois chiches cuits",ar:"حمص مطبوخ",en:"Cooked chickpeas",k:164},{fr:"Huile d'olive",ar:"زيت الزيتون",en:"Olive oil",k:884},{fr:"Chocolat noir",ar:"شوكولاتة داكنة",en:"Dark chocolate",k:598}];
+const T={
+fr:{photoTitle:"📸 Photographier un repas",photoDescription:"Prenez une photo de votre plat ou choisissez une image dans votre galerie.",photoLabel:"Photo du repas",gallery:"🖼️ Choisir dans la galerie",camera:"📷 Prendre une photo",analyze:"Analyser la photo",removePhoto:"Retirer la photo",photoReady:"Photo prête. L’estimation automatique des aliments et des calories nécessite de connecter un service d’IA sécurisé.",photoNone:"Aucune photo sélectionnée.",photoNeed:"Choisissez ou prenez d’abord une photo.",analyzing:"Analyse en cours…",analysisFailed:"Échec de l’analyse. Vérifiez la configuration du service IA et réessayez.",analysisEmpty:"L’IA n’a pas identifié d’aliments. Essayez une photo plus nette.",addResult:"Ajouter au journal",addedResult:"Aliment ajouté au journal.",gramsWord:"g estimés",totalCalories:"Calories estimées",subtitle:"Votre nutrition, en toute simplicité",welcome:"Suivi nutritionnel quotidien",cal:"Calories consommées",meals:"Nombre d'aliments",add:"Ajouter un aliment",search:"Rechercher un aliment",grams:"Quantité (g)",cal100:"kcal pour 100 g",calc:"Choisissez un aliment de la liste pour remplir ses calories pour 100 g, ou saisissez une valeur manuellement.",addBtn:"Ajouter à mon journal",manual:"Les valeurs sont des estimations moyennes et varient selon la préparation.",journal:"Mon journal alimentaire",empty:"Aucun aliment ajouté aujourd'hui.",clear:"Effacer le journal du jour",database:"Base d'aliments intégrée",dbNote:"Valeurs indicatives pour 100 g.",privacy:"Les données sont enregistrées localement dans ce navigateur.",remove:"Supprimer",confirm:"Effacer le journal du jour ?",kcal:"kcal",items:"aliments"},
+ar:{photoTitle:"📸 تصوير الوجبة",photoDescription:"التقط صورة لوجبتك أو اختر صورة من معرض الهاتف.",photoLabel:"صورة الوجبة",gallery:"🖼️ اختيار صورة من المعرض",camera:"📷 التقاط صورة بالكاميرا",analyze:"تحليل الصورة",removePhoto:"إزالة الصورة",photoReady:"تم اختيار الصورة. لتحديد الأطعمة والسعرات تلقائيًا، يجب ربط التطبيق بخدمة ذكاء اصطناعي آمنة.",photoNone:"لم يتم اختيار صورة.",photoNeed:"التقط صورة أو اخترها أولًا.",analyzing:"جارٍ تحليل الصورة…",analysisFailed:"فشل التحليل. تحقق من إعداد خدمة الذكاء الاصطناعي ثم أعد المحاولة.",analysisEmpty:"لم يتم التعرف على أطعمة. جرّب صورة أوضح.",addResult:"إضافة إلى السجل",addedResult:"تمت إضافة الطعام إلى السجل.",gramsWord:"غرام تقديري",totalCalories:"السعرات المقدرة",subtitle:"تغذيتك بكل بساطة",welcome:"متابعة التغذية اليومية",cal:"السعرات المستهلكة",meals:"عدد الأطعمة",add:"إضافة طعام",search:"ابحث عن طعام",grams:"الكمية (غرام)",cal100:"السعرات لكل 100 غرام",calc:"اختر طعامًا من القائمة أو أدخل السعرات يدويًا.",addBtn:"أضف إلى سجلي",manual:"القيم تقديرية وقد تختلف حسب طريقة التحضير.",journal:"سجلي الغذائي",empty:"لم تتم إضافة أي طعام اليوم.",clear:"مسح سجل اليوم",database:"قاعدة الأطعمة المدمجة",dbNote:"قيم تقريبية لكل 100 غرام.",privacy:"يُحفظ السجل محليًا في هذا المتصفح.",remove:"حذف",confirm:"هل تريد مسح سجل اليوم؟",kcal:"سعرة",items:"أطعمة"},
+en:{photoTitle:"📸 Photograph a meal",photoDescription:"Take a photo of your meal or choose an image from your gallery.",photoLabel:"Meal photo",gallery:"🖼️ Choose from gallery",camera:"📷 Take a photo",analyze:"Analyze photo",removePhoto:"Remove photo",photoReady:"Photo selected. Automatic food and calorie estimation requires connecting a secure AI service.",photoNone:"No photo selected.",photoNeed:"Take or choose a photo first.",analyzing:"Analyzing image…",analysisFailed:"Analysis failed. Check the AI service configuration and try again.",analysisEmpty:"No foods were identified. Try a clearer photo.",addResult:"Add to journal",addedResult:"Food added to journal.",gramsWord:"estimated g",totalCalories:"Estimated calories",subtitle:"Nutrition made simple",welcome:"Daily nutrition tracking",cal:"Calories consumed",meals:"Food entries",add:"Add a food",search:"Search for a food",grams:"Quantity (g)",cal100:"kcal per 100 g",calc:"Choose a food or enter calories manually.",addBtn:"Add to my journal",manual:"Values are estimates and vary by preparation.",journal:"My food journal",empty:"No foods added today.",clear:"Clear today's journal",database:"Built-in food database",dbNote:"Approximate values per 100 g.",privacy:"Entries are saved locally in this browser.",remove:"Delete",confirm:"Clear today's journal?",kcal:"kcal",items:"foods"}};
+let journal=[];try{journal=JSON.parse(localStorage.getItem("caloriai_journal_v2")||"[]");if(!Array.isArray(journal))journal=[]}catch(e){}
+const $=id=>document.getElementById(id), lang=()=> $("language").value, name=f=>f[lang()]||f.fr;
+let selectedFile=null;
+function renderOptions(){const d=$("foodOptions");d.innerHTML="";foods.forEach(f=>{let o=document.createElement("option");o.value=name(f);d.appendChild(o)});$("databaseSummary").textContent=foods.length+" "+T[lang()].items}
+function findFood(s){s=s.trim().toLowerCase();return foods.find(f=>[f.fr,f.ar,f.en].some(n=>n.toLowerCase()===s))}
+function render(){const t=T[lang()],today=new Date().toISOString().slice(0,10),items=journal.filter(x=>x.date===today);$("total").textContent=Math.round(items.reduce((a,x)=>a+x.kcal,0)*10)/10;$("count").textContent=items.length;$("journal").innerHTML="";$("empty").style.display=items.length?"none":"block";items.forEach(x=>{let li=document.createElement("li"),title=document.createElement("div"),detail=document.createElement("div"),b=document.createElement("button");title.className="food-title";title.textContent=x.name;detail.className="food-detail";detail.textContent=x.grams+" g · "+x.kcal+" "+t.kcal;b.className="danger";b.textContent=t.remove;b.onclick=()=>{journal=journal.filter(y=>y.id!==x.id);save();render()};li.append(title,detail,b);$("journal").appendChild(li)})}
+function save(){localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal))}
+function translate(){let l=lang(),t=T[l];document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";$("photoTitle").textContent=t.photoTitle;$("photoDescription").textContent=t.photoDescription;$("photoLabel").textContent=t.photoLabel;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("analyzePhotoButton").textContent=t.analyze;$("removePhotoButton").textContent=t.removePhoto;if(!selectedFile)$("photoStatus").textContent=t.photoNone;const map={subtitle:"subtitle",welcome:"welcome",cal:"calLabel",meals:"mealLabel",add:"addTitle",search:"searchLabel",grams:"gramsLabel",cal100:"cal100Label",calc:"calcNote",addBtn:"addButton",manual:"manualNote",journal:"journalTitle",empty:"empty",clear:"clearButton",database:"databaseTitle",dbNote:"databaseNote",privacy:"privacyNote"};Object.entries(map).forEach(([k,id])=>$(id).textContent=t[k]);$("foodSearch").placeholder=l==="ar"?"مثال: تفاح، بيض، أرز":l==="en"?"e.g. apple, egg, rice":"Ex. : pomme, œuf, riz";renderOptions();render()}
+$("language").onchange=translate;$("foodSearch").oninput=()=>{let f=findFood($("foodSearch").value);if(f)$("calories100").value=f.k};
+$("addButton").onclick=()=>{let n=$("foodSearch").value.trim(),g=Number($("grams").value),k=Number($("calories100").value);if(!n||g<=0||!Number.isFinite(g)||k<0||!Number.isFinite(k)){alert("Please enter a food, quantity and calories.");return}let f=findFood(n);journal.unshift({id:Date.now(),name:f?name(f):n,grams:g,kcal:Math.round(k*g/100*10)/10,date:new Date().toISOString().slice(0,10)});save();render();$("foodSearch").value="";$("calories100").value="";$("grams").value=100};
+$("clearButton").onclick=()=>{if(confirm(T[lang()].confirm)){let today=new Date().toISOString().slice(0,10);journal=journal.filter(x=>x.date!==today);save();render()}};let selectedPhotoUrl=null;
+$("galleryButton").addEventListener("click",()=>$("foodPhoto").click());
+$("cameraButton").addEventListener("click",()=>$("cameraPhoto").click());
+function handlePhotoChange(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith("image/")){alert("Please choose an image.");event.target.value="";return}
+  selectedFile=file;
+  if(selectedPhotoUrl)URL.revokeObjectURL(selectedPhotoUrl);
+  selectedPhotoUrl=URL.createObjectURL(file);
+  $("photoPreview").src=selectedPhotoUrl;
+  $("photoPreview").style.display="block";
+  $("photoStatus").textContent=T[lang()].photoReady;
+  // Reset the other input so the same photo can be selected again later.
+  if(event.target.id==="foodPhoto")$("cameraPhoto").value="";
+  else $("foodPhoto").value="";
 }
-};
-
-const foods = [
-{fr:"Pomme",ar:"تفاح",en:"Apple",k:52},
-{fr:"Banane",ar:"موز",en:"Banana",k:89},
-{fr:"Orange",ar:"برتقال",en:"Orange",k:47},
-{fr:"Datte",ar:"تمر",en:"Date",k:282},
-{fr:"Riz blanc cuit",ar:"أرز مطبوخ",en:"Cooked rice",k:130},
-{fr:"Poulet cuit",ar:"دجاج مطبوخ",en:"Cooked chicken",k:165},
-{fr:"Œuf",ar:"بيض",en:"Egg",k:155},
-{fr:"Pain blanc",ar:"خبز أبيض",en:"White bread",k:266},
-{fr:"Pâtes cuites",ar:"معكرونة مطبوخة",en:"Cooked pasta",k:157},
-{fr:"Lait entier",ar:"حليب كامل الدسم",en:"Whole milk",k:61},
-{fr:"Yaourt nature",ar:"زبادي طبيعي",en:"Plain yogurt",k:61},
-{fr:"Pomme de terre",ar:"بطاطس",en:"Potato",k:87},
-{fr:"Tomate",ar:"طماطم",en:"Tomato",k:18},
-{fr:"Amandes",ar:"لوز",en:"Almonds",k:579},
-{fr:"Huile d'olive",ar:"زيت الزيتون",en:"Olive oil",k:884}
-];
-
-function currentLang(){
-return $("language").value;
-}
-
-function text(key){
-return translations[currentLang()][key];
-}
-
-function foodName(food){
-return food[currentLang()] || food.fr;
-}
-
-let journal = [];
-
-try{
-const saved = localStorage.getItem("caloriai_journal_v3");
-journal = saved ? JSON.parse(saved) : [];
-if(!Array.isArray(journal)) journal = [];
-}catch(e){
-journal = [];
-}
-
-let selectedFile = null;
-let previewURL = null;
-
-function saveJournal(){
-try{
-localStorage.setItem("caloriai_journal_v3",JSON.stringify(journal));
-}catch(e){
-alert("Could not save data on this device.");
-}
-}
-
-function todayString(){
-const d = new Date();
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-}
-
-function renderJournal(){
-const today = todayString();
-const items = journal.filter(x=>x.date===today);
-
-$("total").textContent = Math.round(
-items.reduce((sum,x)=>sum+Number(x.kcal||0),0)
-);
-
-$("count").textContent = items.length;
-$("journal").innerHTML = "";
-$("emptyMessage").style.display = items.length ? "none" : "block";
-
-items.forEach(item=>{
-const li = document.createElement("li");
-li.style.listStyle = "none";
-li.style.padding = "12px 0";
-li.style.borderBottom = "1px solid #e1e6ef";
-
-const title = document.createElement("strong");
-title.textContent = item.name;
-
-const details = document.createElement("p");
-details.className = "muted";
-details.textContent = item.grams+" g · "+item.kcal+" "+text("kcal");
-
-const remove = document.createElement("button");
-remove.className = "danger";
-remove.textContent = text("remove");
-
-remove.onclick = ()=>{
-journal = journal.filter(x=>x.id!==item.id);
-saveJournal();
-renderJournal();
-};
-
-li.append(title,details,remove);
-$("journal").appendChild(li);
+$("foodPhoto").addEventListener("change",handlePhotoChange);
+$("cameraPhoto").addEventListener("change",handlePhotoChange);
+$("analyzePhotoButton").addEventListener("click", async ()=>{
+  const file=selectedFile, t=T[lang()];
+  if(!file){$("photoStatus").textContent=t.photoNeed;return}
+  const button=$("analyzePhotoButton");
+  button.disabled=true;button.style.opacity=".65";
+  $("analysisResults").style.display="none";$("analysisResults").innerHTML="";
+  $("photoStatus").textContent=t.analyzing;
+  try{
+    const dataUrl=await new Promise((resolve,reject)=>{
+      const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error("Could not read image"));reader.readAsDataURL(file);
+    });
+    const response=await fetch("https://caloriai-photo-api.ayhamimarati-c54.workers.dev",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({image:dataUrl,mimeType:file.type,language:lang()})
+    });
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(payload.error||payload.message||("HTTP "+response.status));
+    const items=Array.isArray(payload.foods)?payload.foods:(Array.isArray(payload.items)?payload.items:[]);
+    if(!items.length)throw new Error("NO_FOODS");
+    const box=$("analysisResults");box.style.display="block";
+    const heading=document.createElement("h3");heading.textContent=t.totalCalories;box.appendChild(heading);
+    items.forEach((food,index)=>{
+      const grams=Math.max(1,Math.round(Number(food.estimated_grams??food.grams??100)));
+      const kcal=Math.max(0,Math.round(Number(food.calories_kcal??food.calories??0)));
+      const nm=String(food.name||food.food||"Food "+(index+1));
+      const row=document.createElement("div");row.className="card";row.style.padding="14px";row.style.margin="10px 0";
+      const title=document.createElement("strong");title.textContent=nm;
+      const detail=document.createElement("p");detail.className="food-detail";detail.textContent=grams+" "+t.gramsWord+" · "+kcal+" "+t.kcal;
+      const editLabel=document.createElement("label");editLabel.textContent=lang()==="ar"?"الكمية (غرام)":lang()==="en"?"Quantity (g)":"Quantité (g)";
+      const gramsInput=document.createElement("input");gramsInput.type="number";gramsInput.min="1";gramsInput.value=grams;
+      const calLabel=document.createElement("label");calLabel.textContent=lang()==="ar"?"السعرات الإجمالية":"Total kcal";
+      const kcalInput=document.createElement("input");kcalInput.type="number";kcalInput.min="0";kcalInput.value=kcal;
+      const add=document.createElement("button");add.textContent=t.addResult;
+      add.onclick=()=>{
+        const g=Number(gramsInput.value),c=Number(kcalInput.value);
+        if(!g||g<1||!Number.isFinite(c)||c<0)return;
+        journal.unshift({id:Date.now()+index,name:nm,grams:g,kcal:Math.round(c*10)/10,date:new Date().toISOString().slice(0,10)});
+        save();render();add.textContent=t.addedResult;add.disabled=true;
+      };
+      row.append(title,detail,editLabel,gramsInput,calLabel,kcalInput,add);box.appendChild(row);
+    });
+    $("photoStatus").textContent=lang()==="ar"?"تم تحليل الصورة. راجع الكميات والسعرات قبل الإضافة.":lang()==="en"?"Image analyzed. Review quantities and calories before adding.":"Photo analysée. Vérifiez les quantités et calories avant l’ajout.";
+  }catch(err){
+    console.error("CaloriAI photo analysis:",err);
+    $("photoStatus").textContent=err.message==="NO_FOODS"?t.analysisEmpty:(t.analysisFailed+" ("+String(err.message||"").slice(0,160)+")");
+  }finally{button.disabled=false;button.style.opacity="1"}
 });
-}
-
-function renderFoodOptions(){
-$("foodOptions").innerHTML = "";
-
-foods.forEach(food=>{
-const option = document.createElement("option");
-option.value = foodName(food);
-$("foodOptions").appendChild(option);
+$("removePhotoButton").addEventListener("click",()=>{
+  if(selectedPhotoUrl){URL.revokeObjectURL(selectedPhotoUrl);selectedPhotoUrl=null}
+  selectedFile=null;$("foodPhoto").value="";$("cameraPhoto").value="";$("photoPreview").removeAttribute("src");$("photoPreview").style.display="none";$("photoStatus").textContent=T[lang()].photoNone;
 });
-}
-
-function applyLanguage(){
-const t = translations[currentLang()];
-
-document.documentElement.lang = currentLang();
-document.documentElement.dir = currentLang()==="ar" ? "rtl" : "ltr";
-
-[
-"subtitle","welcome","calLabel","mealLabel",
-"photoTitle","photoDescription","addTitle",
-"foodLabel","gramsLabel","caloriesLabel",
-"addButton","manualNote","journalTitle",
-"emptyMessage","clearButton","privacyNote"
-].forEach(id=>{
-$(id).textContent = t[id];
-});
-
-$("galleryButton").textContent = t.gallery;
-$("cameraButton").textContent = t.camera;
-$("analyzeButton").textContent = t.analyze;
-$("removePhotoButton").textContent = t.removePhoto;
-
-if(!selectedFile){
-$("photoStatus").textContent = t.noPhoto;
-}
-
-renderFoodOptions();
-renderJournal();
-}
-
-$("language").addEventListener("change",applyLanguage);
-
-/*
- * إصلاح المعرض:
- * هذا الزر يستدعي حقل اختيار الصور الذي لا يحتوي على capture.
- * لا يستعمل حقل الكاميرا.
- */
-$("galleryButton").addEventListener("click",function(){
-$("foodPhoto").click();
-});
-
-/*
- * الكاميرا فقط:
- * هذا الزر يستدعي حقلًا منفصلًا يحتوي على capture.
- */
-$("cameraButton").addEventListener("click",function(){
-$("cameraPhoto").click();
-});
-
-function handleFileSelection(event){
-const file = event.target.files && event.target.files[0];
-if(!file) return;
-
-if(!file.type || !file.type.startsWith("image/")){
-$("photoStatus").textContent = "Please select an image file.";
-event.target.value = "";
-return;
-}
-
-selectedFile = file;
-
-if(previewURL){
-URL.revokeObjectURL(previewURL);
-}
-
-previewURL = URL.createObjectURL(file);
-
-$("photoPreview").src = previewURL;
-$("photoPreview").style.display = "block";
-$("photoStatus").textContent = text("photoReady");
-$("analysisResults").innerHTML = "";
-
-/* منع تكرار المشكلة عند اختيار الصورة نفسها */
-if(event.target.id==="foodPhoto"){
-$("cameraPhoto").value = "";
-}else{
-$("foodPhoto").value = "";
-}
-}
-
-$("foodPhoto").addEventListener("change",handleFileSelection);
-$("cameraPhoto").addEventListener("change",handleFileSelection);
-
-$("removePhotoButton").addEventListener("click",function(){
-selectedFile = null;
-
-if(previewURL){
-URL.revokeObjectURL(previewURL);
-previewURL = null;
-}
-
-$("foodPhoto").value = "";
-$("cameraPhoto").value = "";
-$("photoPreview").removeAttribute("src");
-$("photoPreview").style.display = "none";
-$("analysisResults").innerHTML = "";
-$("photoStatus").textContent = text("noPhoto");
-});
-
-/*
- * تحليل الصورة عبر خدمة الذكاء الاصطناعي.
- * يجب أن تكون الخدمة متاحة وأن تتوافق مع تنسيق الطلب والاستجابة.
- */
-$("analyzeButton").addEventListener("click",async function(){
-if(!selectedFile){
-$("photoStatus").textContent = text("photoRequired");
-return;
-}
-
-const button = $("analyzeButton");
-button.disabled = true;
-$("photoStatus").textContent = text("analyzing");
-$("analysisResults").innerHTML = "";
-
-try{
-const dataURL = await new Promise((resolve,reject)=>{
-const reader = new FileReader();
-reader.onload = ()=>resolve(reader.result);
-reader.onerror = ()=>reject(new Error("Could not read image"));
-reader.readAsDataURL(selectedFile);
-});
-
-const response = await fetch(
-"https://caloriai-photo-api.ayhamimarati-c54.workers.dev",
-{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-image:dataURL,
-mimeType:selectedFile.type,
-language:currentLang()
-})
-}
-);
-
-const data = await response.json();
-
-if(!response.ok){
-throw new Error(data.error || "HTTP "+response.status);
-}
-
-const detected = Array.isArray(data.foods)
-? data.foods
-: Array.isArray(data.items) ? data.items : [];
-
-if(!detected.length){
-$("photoStatus").textContent = text("analysisEmpty");
-return;
-}
-
-detected.forEach((food,index)=>{
-const name = String(food.name || food.food || ("Food "+(index+1)));
-
-const grams = Math.max(1,Math.round(Number(
-food.estimated_grams ?? food.grams ?? 100
-)));
-
-const calories = Math.max(0,Math.round(Number(
-food.calories_kcal ?? food.calories ?? 0
-)));
-
-const box = document.createElement("div");
-box.className = "result";
-
-const title = document.createElement("div");
-title.className = "food-name";
-title.textContent = name;
-
-const gramsLabel = document.createElement("label");
-gramsLabel.textContent = text("quantity");
-
-const gramsInput = document.createElement("input");
-gramsInput.type = "number";
-gramsInput.min = "1";
-gramsInput.value = grams;
-
-const calLabel = document.createElement("label");
-calLabel.textContent = text("totalCalories");
-
-const calInput = document.createElement("input");
-calInput.type = "number";
-calInput.min = "0";
-calInput.value = calories;
-
-const add = document.createElement("button");
-add.textContent = text("addResult");
-
-add.onclick = ()=>{
-const g = Number(gramsInput.value);
-const c = Number(calInput.value);
-
-if(!Number.isFinite(g)||g<=0||!Number.isFinite(c)||c<0){
-alert(text("invalid"));
-return;
-}
-
-journal.unshift({
-id:Date.now()+index,
-name:name,
-grams:g,
-kcal:Math.round(c*10)/10,
-date:todayString()
-});
-
-saveJournal();
-renderJournal();
-add.textContent = text("added");
-add.disabled = true;
-};
-
-box.append(title,gramsLabel,gramsInput,calLabel,calInput,add);
-$("analysisResults").appendChild(box);
-});
-
-$("photoStatus").textContent = text("photoReady");
-
-}catch(error){
-console.error("CaloriAI analysis error:",error);
-$("photoStatus").textContent = text("analysisError")+" "+String(error.message||"");
-}finally{
-button.disabled = false;
-}
-});
-
-$("foodName").addEventListener("input",function(){
-const value = this.value.trim().toLowerCase();
-const food = foods.find(f=>
-[f.fr,f.ar,f.en].some(n=>n.toLowerCase()===value)
-);
-
-if(food){
-$("calories100").value = food.k;
-}
-});
-
-$("addButton").addEventListener("click",function(){
-const name = $("foodName").value.trim();
-const grams = Number($("grams").value);
-const calories = Number($("calories100").value);
-
-if(!name||!Number.isFinite(grams)||grams<=0||
-!Number.isFinite(calories)||calories<0){
-alert(text("invalid"));
-return;
-}
-
-journal.unshift({
-id:Date.now(),
-name:name,
-grams:grams,
-kcal:Math.round(calories*grams/100*10)/10,
-date:todayString()
-});
-
-saveJournal();
-renderJournal();
-
-$("foodName").value = "";
-$("grams").value = 100;
-$("calories100").value = "";
-});
-
-$("clearButton").addEventListener("click",function(){
-if(!confirm(text("confirmClear"))) return;
-
-const today = todayString();
-journal = journal.filter(x=>x.date!==today);
-
-saveJournal();
-renderJournal();
-});
-
-applyLanguage();
-</script>
-
-</body>
-</html>
+let dailyGoal=2000;try{dailyGoal=Math.max(500,Number(localStorage.getItem("caloriai_daily_goal")||2000))}catch(e){}
+const macroMap={"Pomme":[0.3,14,0.2],"تفاح":[0.3,14,0.2],"Apple":[0.3,14,0.2],"Banane":[1.1,22.8,0.3],"موز":[1.1,22.8,0.3],"Banana":[1.1,22.8,0.3],"Œuf":[13,1.1,11],"بيض":[13,1.1,11],"Egg":[13,1.1,11],"Poulet cuit":[31,0,3.6],"دجاج مطبوخ":[31,0,3.6],"Cooked chicken":[31,0,3.6],"Riz blanc cuit":[2.7,28,0.3],"أرز أبيض مطبوخ":[2.7,28,0.3],"Cooked white rice":[2.7,28,0.3],"Pain blanc":[8.9,49,3.2],"خبز أبيض":[8.9,49,3.2],"White bread":[8.9,49,3.2]};
+const baseRender=render;
+render=function(){baseRender();const today=new Date().toISOString().slice(0,10),items=journal.filter(x=>x.date===today),total=items.reduce((a,x)=>a+(Number(x.kcal)||0),0),remaining=Math.max(0,dailyGoal-total);$("remaining").textContent=Math.round(remaining).toLocaleString(lang()==="fr"?"fr-FR":lang()==="ar"?"ar-MA":"en-US")+" kcal "+(lang()==="ar"?"متبقية":lang()==="en"?"remaining":"restantes");$("goalText").textContent=(lang()==="ar"?"الهدف: ":lang()==="en"?"Goal: ":"Objectif : ")+dailyGoal.toLocaleString()+" kcal";$("progressBar").style.width=Math.min(100,total/dailyGoal*100)+"%";let p=0,c=0,f=0;items.forEach(x=>{let m=macroMap[x.name]||[0,0,0];p+=m[0]*x.grams/100;c+=m[1]*x.grams/100;f+=m[2]*x.grams/100});$("proteinTotal").textContent=Math.round(p)+" g";$("carbTotal").textContent=Math.round(c)+" g";$("fatTotal").textContent=Math.round(f)+" g"};
+$("goalEdit").addEventListener("click",()=>{const v=prompt(lang()==="ar"?"أدخل هدف السعرات اليومي:":lang()==="en"?"Enter daily calorie goal:":"Entrez votre objectif calorique quotidien :",dailyGoal);if(v!==null&&Number(v)>=500&&Number(v)<=10000){dailyGoal=Math.round(Number(v));localStorage.setItem("caloriai_daily_goal",String(dailyGoal));render()}});
+$("quickMeal").addEventListener("click",()=>$("photoCard").scrollIntoView({behavior:"smooth"}));$("quickWeight").addEventListener("click",()=>alert(lang()==="ar"?"ميزة تتبع الوزن ستكون متاحة في تحديث لاحق.":lang()==="en"?"Weight tracking will be available in a future update.":"Le suivi du poids sera disponible dans une prochaine mise à jour."));document.querySelectorAll(".bottom-nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".bottom-nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");const target=b.dataset.target;if(target==="top")window.scrollTo({top:0,behavior:"smooth"});else if(target==="photoCard"||target==="journalCard"||target==="profileCard")$(target).scrollIntoView({behavior:"smooth"});else alert(lang()==="ar"?"إعدادات الملف الشخصي قيد التطوير.":lang()==="en"?"Profile settings are under development.":"Les paramètres du profil sont en cours de développement.")}));
+translate();
+</script></body></html>
