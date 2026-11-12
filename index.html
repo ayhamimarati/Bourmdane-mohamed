@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,14 +10,13 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f3f6fc;color:#172033}
-header{background:#fff;padding:16px;text-align:center}
+header{background:white;padding:18px;text-align:center}
 h1{color:#1677ff}
 main{max-width:650px;margin:auto;padding:14px}
 .card{background:white;padding:18px;border-radius:18px;margin-bottom:15px;box-shadow:0 3px 15px #00000008}
 label{display:block;margin:12px 0 6px;font-weight:bold}
 input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #dfe5ee;font-size:16px}
-button{background:#1677ff;color:white;border:0;font-weight:bold;margin-top:10px;cursor:pointer}
-button:disabled{opacity:.6}
+button{background:#1677ff;color:white;border:0;font-weight:bold;margin-top:10px}
 .secondary{background:#e8f1ff;color:#145dcc}
 .danger{background:#fff0f0;color:#b42318}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -25,9 +25,8 @@ button:disabled{opacity:.6}
 .muted{color:#68758a;line-height:1.5}
 #preview{display:none;width:100%;max-height:300px;object-fit:contain;margin-top:12px;border-radius:12px}
 .food{border:1px solid #dfe5ee;padding:12px;border-radius:12px;margin-top:12px}
-.status{overflow-wrap:anywhere;font-size:14px;white-space:pre-wrap}
+.status{overflow-wrap:anywhere;font-size:14px}
 [dir=rtl]{text-align:right}
-#photo{background:#f8faff}
 </style>
 </head>
 
@@ -35,7 +34,7 @@ button:disabled{opacity:.6}
 <header>
 <h1>🥗 CaloriAI Premium</h1>
 <p id="subtitle">Suivi nutritionnel intelligent</p>
-<select id="language" aria-label="Language">
+<select id="language">
 <option value="fr">Français</option>
 <option value="ar">العربية</option>
 <option value="en">English</option>
@@ -43,6 +42,7 @@ button:disabled{opacity:.6}
 </header>
 
 <main>
+
 <section class="card">
 <h2 id="dashboard">📊 Tableau de bord</h2>
 <div class="stats">
@@ -60,17 +60,18 @@ button:disabled{opacity:.6}
 
 <section class="card">
 <h2 id="photoTitle">📸 Analyser un repas</h2>
-<p id="photoHelp" class="muted">Prenez une photo ou choisissez une image de votre galerie.</p>
+<p id="photoHelp" class="muted">
+Prenez une photo ou choisissez une image de votre galerie.
+</p>
 
 <label id="photoLabel" for="photo">Photo du repas</label>
-
-<!-- Sans capture : permet de choisir une image dans la galerie -->
-<input id="photo" type="file" accept="image/*">
+<input id="photo" type="file" accept="image/*" capture="environment">
 
 <img id="preview" alt="Aperçu du repas">
 
 <button id="analyze">🤖 Analyser la photo</button>
 <button id="removePhoto" class="secondary">Retirer la photo</button>
+
 <p id="status" class="status muted">Choisissez une photo.</p>
 <div id="results"></div>
 </section>
@@ -97,14 +98,17 @@ button:disabled{opacity:.6}
 <button id="clear" class="danger">Effacer le journal du jour</button>
 </section>
 
-<p class="muted" id="disclaimer">Les quantités et calories calculées à partir d'une photo sont des estimations.</p>
+<p class="muted" id="disclaimer">
+Les quantités et calories calculées à partir d'une photo sont des estimations.
+</p>
+
 </main>
 
 <script>
 const API = "https://caloriai-photo-api.ayhamimarati-c54.workers.dev";
 
 const translations = {
-fr:{
+fr: {
 subtitle:"Suivi nutritionnel intelligent",
 dashboard:"📊 Tableau de bord",
 caloriesLabel:"Calories consommées",
@@ -134,10 +138,9 @@ totalKcal:"Calories totales",
 remove:"Supprimer",
 confirm:"Effacer le journal d'aujourd'hui ?",
 foodPlaceholder:"Ex. : pomme",
-manualError:"Entrez le nom, la quantité et les calories.",
-imageError:"Impossible de lire cette image."
+manualError:"Entrez le nom, la quantité et les calories."
 },
-ar:{
+ar: {
 subtitle:"متابعة التغذية بذكاء",
 dashboard:"📊 لوحة المعلومات",
 caloriesLabel:"السعرات المستهلكة",
@@ -167,10 +170,9 @@ totalKcal:"السعرات الإجمالية",
 remove:"حذف",
 confirm:"هل تريد مسح سجل اليوم؟",
 foodPlaceholder:"مثال: تفاح",
-manualError:"أدخل اسم الطعام والكمية والسعرات.",
-imageError:"تعذرت قراءة الصورة."
+manualError:"أدخل اسم الطعام والكمية والسعرات."
 },
-en:{
+en: {
 subtitle:"Smart nutrition tracking",
 dashboard:"📊 Dashboard",
 caloriesLabel:"Calories consumed",
@@ -200,15 +202,13 @@ totalKcal:"Total calories",
 remove:"Delete",
 confirm:"Clear today's journal?",
 foodPlaceholder:"Example: apple",
-manualError:"Enter the food name, quantity and calories.",
-imageError:"Could not read this image."
+manualError:"Enter the food name, quantity and calories."
 }
 };
 
 const $ = id => document.getElementById(id);
-let photoData = "";
-let journal = [];
 
+let journal = [];
 try {
   journal = JSON.parse(localStorage.getItem("caloriai_journal_v3") || "[]");
   if (!Array.isArray(journal)) journal = [];
@@ -216,31 +216,29 @@ try {
   journal = [];
 }
 
-function today(){
-  const d = new Date();
-  return d.getFullYear() + "-" +
-    String(d.getMonth()+1).padStart(2,"0") + "-" +
-    String(d.getDate()).padStart(2,"0");
+let photoData = "";
+
+function save() {
+  localStorage.setItem("caloriai_journal_v3", JSON.stringify(journal));
 }
 
-function save(){
-  try {
-    localStorage.setItem("caloriai_journal_v3", JSON.stringify(journal));
-  } catch(e) {
-    alert("Impossible d'enregistrer les données sur cet appareil.");
-  }
+function today() {
+  return new Date().toLocaleDateString("en-CA");
 }
 
-function render(){
+function render() {
   const t = translations[$("language").value];
   const items = journal.filter(x => x.date === today());
 
-  $("total").textContent = Math.round(items.reduce((s,x)=>s+x.kcal,0));
+  $("total").textContent = Math.round(
+    items.reduce((sum, x) => sum + x.kcal, 0)
+  );
+
   $("count").textContent = items.length;
   $("journal").innerHTML = "";
   $("empty").style.display = items.length ? "none" : "block";
 
-  items.forEach(item=>{
+  items.forEach(item => {
     const box = document.createElement("div");
     box.className = "food";
 
@@ -253,90 +251,92 @@ function render(){
     const del = document.createElement("button");
     del.className = "danger";
     del.textContent = t.remove;
-    del.onclick = ()=>{
-      journal = journal.filter(x=>x.id!==item.id);
+
+    del.onclick = () => {
+      journal = journal.filter(x => x.id !== item.id);
       save();
       render();
     };
 
-    box.append(name,detail,del);
+    box.append(name, detail, del);
     $("journal").appendChild(box);
   });
 }
 
-function addFood(name,grams,kcal){
+function addFood(name, grams, kcal) {
   journal.unshift({
-    id:Date.now()+Math.random(),
-    name,
-    grams,
-    kcal:Math.round(kcal*10)/10,
-    date:today()
+    id: Date.now() + Math.random(),
+    name: name,
+    grams: grams,
+    kcal: Math.round(kcal * 10) / 10,
+    date: today()
   });
   save();
   render();
 }
 
-function translate(){
+function translate() {
   const lang = $("language").value;
   const t = translations[lang];
 
   document.documentElement.lang = lang;
-  document.documentElement.dir = lang==="ar" ? "rtl" : "ltr";
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
 
-  [
-    "subtitle","dashboard","caloriesLabel","foodsLabel",
-    "photoTitle","photoHelp","photoLabel","analyze",
-    "removePhoto","manualTitle","foodLabel","gramsLabel",
-    "kcalLabel","add","journalTitle","empty","clear","disclaimer"
-  ].forEach(id=>{
-    $(id).textContent = t[id];
+  Object.keys(t).forEach(key => {
+    const element = $(key);
+    if (element && !["choose","analyzing","failed","none",
+      "grams","totalKcal","addResult","added","remove",
+      "confirm","manualError"].includes(key)) {
+      if (key === "foodPlaceholder") {
+        $("food").placeholder = t[key];
+      } else {
+        element.textContent = t[key];
+      }
+    }
   });
 
-  $("food").placeholder = t.foodPlaceholder;
   render();
 }
 
 $("language").onchange = translate;
 
-$("photo").addEventListener("change",async()=>{
-  const file = $("photo").files && $("photo").files[0];
+$("photo").onchange = async () => {
+  const file = $("photo").files[0];
   photoData = "";
-  $("results").innerHTML = "";
   $("preview").style.display = "none";
+  $("results").innerHTML = "";
 
-  if(!file){
-    $("status").textContent = translations[$("language").value].choose;
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    $("status").textContent = "Please select an image.";
     return;
   }
 
-  if(!file.type.startsWith("image/")){
-    $("status").textContent = "Please select an image file.";
-    $("photo").value = "";
-    return;
-  }
-
-  try{
-    $("status").textContent = translations[$("language").value].analyzing;
-
+  try {
+    // Resize the image to reduce upload size.
     const bitmap = await createImageBitmap(file);
     const canvas = document.createElement("canvas");
-    const scale = Math.min(1,1200/Math.max(bitmap.width,bitmap.height));
+    const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
 
-    canvas.width = Math.max(1,Math.round(bitmap.width*scale));
-    canvas.height = Math.max(1,Math.round(bitmap.height*scale));
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
 
-    canvas.getContext("2d").drawImage(bitmap,0,0,canvas.width,canvas.height);
-    photoData = canvas.toDataURL("image/jpeg",0.82);
+    canvas.getContext("2d").drawImage(
+      bitmap, 0, 0, canvas.width, canvas.height
+    );
+
+    photoData = canvas.toDataURL("image/jpeg", 0.82);
 
     $("preview").src = photoData;
     $("preview").style.display = "block";
-    $("status").textContent = "";
-  }catch(error){
-    $("status").textContent = translations[$("language").value].imageError;
+    $("status").textContent = translations[$("language").value].choose;
+  } catch(error) {
+    $("status").textContent = "Could not load this image.";
   }
-});
+};
 
-$("removePhoto").onclick = ()=>{
+$("removePhoto").onclick = () => {
   photoData = "";
   $("photo").value = "";
   $("preview").removeAttribute("src");
@@ -345,10 +345,10 @@ $("removePhoto").onclick = ()=>{
   $("status").textContent = translations[$("language").value].choose;
 };
 
-$("analyze").onclick = async()=>{
+$("analyze").onclick = async () => {
   const t = translations[$("language").value];
 
-  if(!photoData){
+  if (!photoData) {
     $("status").textContent = t.choose;
     return;
   }
@@ -357,38 +357,38 @@ $("analyze").onclick = async()=>{
   $("status").textContent = t.analyzing;
   $("results").innerHTML = "";
 
-  try{
-    const response = await fetch(API,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        image:photoData,
-        language:$("language").value
+  try {
+    const response = await fetch(API, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        image: photoData,
+        language: $("language").value
       })
     });
 
-    const data = await response.json().catch(()=>({}));
-    if(!response.ok){
-      throw new Error(data.error || ("HTTP "+response.status));
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "HTTP " + response.status);
     }
 
-    if(!Array.isArray(data.foods) || data.foods.length===0){
+    if (!Array.isArray(data.foods) || !data.foods.length) {
       $("status").textContent = t.none;
       return;
     }
 
     $("status").textContent = "";
-
     const heading = document.createElement("h3");
     heading.textContent = t.totalKcal;
     $("results").appendChild(heading);
 
-    data.foods.forEach(food=>{
+    data.foods.forEach(food => {
       const box = document.createElement("div");
       box.className = "food";
 
-      const name = document.createElement("strong");
-      name.textContent = food.name || "Food";
+      const title = document.createElement("strong");
+      title.textContent = food.name || "Food";
 
       const gramsLabel = document.createElement("label");
       gramsLabel.textContent = t.grams;
@@ -396,7 +396,7 @@ $("analyze").onclick = async()=>{
       const grams = document.createElement("input");
       grams.type = "number";
       grams.min = "1";
-      grams.value = Math.round(Number(food.estimated_grams)||100);
+      grams.value = Math.round(Number(food.estimated_grams) || 100);
 
       const kcalLabel = document.createElement("label");
       kcalLabel.textContent = t.totalKcal;
@@ -404,58 +404,59 @@ $("analyze").onclick = async()=>{
       const kcal = document.createElement("input");
       kcal.type = "number";
       kcal.min = "0";
-      kcal.value = Math.round(Number(food.calories_kcal)||0);
+      kcal.value = Math.round(Number(food.calories_kcal) || 0);
 
       const add = document.createElement("button");
       add.textContent = t.addResult;
 
-      add.onclick = ()=>{
+      add.onclick = () => {
         const g = Number(grams.value);
         const c = Number(kcal.value);
 
-        if(!Number.isFinite(g)||g<1||!Number.isFinite(c)||c<0){
-          alert(t.manualError);
+        if (!Number.isFinite(g) || g < 1 ||
+            !Number.isFinite(c) || c < 0) {
           return;
         }
 
-        addFood(name.textContent,g,c);
+        addFood(title.textContent, g, c);
         add.textContent = t.added;
         add.disabled = true;
       };
 
-      box.append(name,gramsLabel,grams,kcalLabel,kcal,add);
+      box.append(title, gramsLabel, grams, kcalLabel, kcal, add);
       $("results").appendChild(box);
     });
 
-  }catch(error){
+  } catch(error) {
     $("status").textContent = t.failed + ": " + error.message;
-  }finally{
+  } finally {
     $("analyze").disabled = false;
   }
 };
 
-$("add").onclick = ()=>{
+$("add").onclick = () => {
   const t = translations[$("language").value];
   const name = $("food").value.trim();
   const grams = Number($("grams").value);
   const kcal100 = Number($("kcal100").value);
 
-  if(!name||!Number.isFinite(grams)||grams<1||
-     $("kcal100").value===""||!Number.isFinite(kcal100)||kcal100<0){
+  if (!name || !Number.isFinite(grams) || grams < 1 ||
+      !Number.isFinite(kcal100) || kcal100 < 0) {
     alert(t.manualError);
     return;
   }
 
-  addFood(name,grams,kcal100*grams/100);
+  addFood(name, grams, kcal100 * grams / 100);
   $("food").value = "";
   $("grams").value = 100;
   $("kcal100").value = "";
 };
 
-$("clear").onclick = ()=>{
+$("clear").onclick = () => {
   const t = translations[$("language").value];
-  if(confirm(t.confirm)){
-    journal = journal.filter(x=>x.date!==today());
+
+  if (confirm(t.confirm)) {
+    journal = journal.filter(x => x.date !== today());
     save();
     render();
   }
