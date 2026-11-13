@@ -323,7 +323,7 @@ body[data-gender="female"] #onboarding .gender-options .gender-option.female-opt
 <section class="card" id="subscriptionCard">
 <h2 id="subscriptionTitle">🌟 Abonnement CaloriAI Premium</h2>
 <p id="trialCounter" class="notice">Essai gratuit : 5 analyses de photos au total.</p>
-<div class="stats"><div class="stat"><span>Mensuel</span><strong>$5.99</strong><small>par mois</small><button type="button" id="monthlySubscribeButton">Choisir mensuel</button></div><div class="stat"><span>Annuel</span><strong>$4.99</strong><small>par mois, facturé $59.88/an</small><button type="button" id="annualSubscribeButton">Choisir annuel</button></div></div>
+<div class="stats"><div class="stat"><span>Pack Découverte</span><strong>$1.99</strong><small>20 analyses de photos</small><button type="button" class="creditPackButton" data-credits="20" data-price="$1.99">Choisir 20 analyses</button></div><div class="stat"><span>Pack Essentiel</span><strong>$3.99</strong><small>50 analyses de photos</small><button type="button" class="creditPackButton" data-credits="50" data-price="$3.99">Choisir 50 analyses</button></div><div class="stat"><span>Pack Premium</span><strong>$5.99</strong><small>100 analyses de photos</small><button type="button" class="creditPackButton" data-credits="100" data-price="$5.99">Choisir 100 analyses</button></div><div class="stat"><span>Pack Max</span><strong>$9.99</strong><small>200 analyses de photos</small><button type="button" class="creditPackButton" data-credits="200" data-price="$9.99">Choisir 200 analyses</button></div></div>
 <p id="paymentSetupNote" class="muted">Les paiements doivent être activés en reliant ces boutons à votre fournisseur de paiement.</p>
 </section>
 <section class="card">
@@ -530,6 +530,21 @@ window.caloriaiLoadProfile = async () => {
   const snap = await getDoc(doc(db, "users", user.uid));
   return snap.exists() ? snap.data() : null;
 };
+// Journal alimentaire synchronisé dans le cloud, séparément pour chaque compte.
+window.caloriaiSaveJournalCloud = async (entries) => {
+  const user = auth?.currentUser;
+  if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
+  await setDoc(doc(db, "users", user.uid, "appData", "journal"), {
+    entries: Array.isArray(entries) ? entries : [],
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+};
+window.caloriaiLoadJournalCloud = async () => {
+  const user = auth?.currentUser;
+  if (!user || !db) return null;
+  const snap = await getDoc(doc(db, "users", user.uid, "appData", "journal"));
+  return snap.exists() && Array.isArray(snap.data().entries) ? snap.data().entries : null;
+};
 window.caloriaiSaveWeightCloud = async (entry) => {
   const user = auth?.currentUser;
   if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
@@ -577,7 +592,7 @@ appLangSelect?.addEventListener("change",()=>{if(langSelect)langSelect.value=app
 document.getElementById("accountForm").addEventListener("submit",async e=>{e.preventDefault();const status=document.getElementById("authStatus"),email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,confirm=document.getElementById("accountPasswordConfirm").value;status.textContent="";if(!loginMode&&password!==confirm){status.textContent=t().mismatch;return}if(!setupDone||!auth){status.textContent=t().badConfig;return}const btn=document.getElementById("createAccountButton");btn.disabled=true;try{let credential;if(loginMode){credential=await signInWithEmailAndPassword(auth,email,password)}else{credential=await createUserWithEmailAndPassword(auth,email,password);await updateProfile(credential.user,{displayName:"gender:"+chosenGender});localStorage.setItem("caloriai_gender",chosenGender);status.textContent=t().success}localStorage.setItem("caloriai_email",credential.user.email||email);localStorage.setItem("caloriai_gender",chosenGender||localStorage.getItem("caloriai_gender")||"male");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"})}catch(cloudErr){console.warn("Profile cloud save failed",cloudErr)}showApp()}catch(err){status.textContent=t().errors?.[err.code]||err.message||"Authentication error"}finally{btn.disabled=false}});
 function showApp(){const g=localStorage.getItem("caloriai_gender")||chosenGender||"male";document.body.dataset.gender=g;onboarding.hidden=true;appShell.hidden=false;setTimeout(()=>window.caloriaiRefreshProfile&&window.caloriaiRefreshProfile(),0)}
 if(langSelect && appLangSelect)appLangSelect.value=langSelect.value;paintGender();translateOnboarding();
-if(setupDone){try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,async user=>{if(user){const display=user.displayName||"";if(display.startsWith("gender:")){chosenGender=display.slice(7);localStorage.setItem("caloriai_gender",chosenGender)}localStorage.setItem("caloriai_email",user.email||"");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"});}catch(err){console.warn("Cloud profile save pending; check Firestore setup/rules.",err)}showApp()}else{onboarding.hidden=false;appShell.hidden=true}})}catch(e){console.error("Firebase setup error",e)}}
+if(setupDone){try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,async user=>{if(user){const display=user.displayName||"";if(display.startsWith("gender:")){chosenGender=display.slice(7);localStorage.setItem("caloriai_gender",chosenGender)}localStorage.setItem("caloriai_email",user.email||"");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"});}catch(err){console.warn("Cloud profile save pending; check Firestore setup/rules.",err)}showApp();if(window.caloriaiSyncJournal)await window.caloriaiSyncJournal()}else{onboarding.hidden=false;appShell.hidden=true}})}catch(e){console.error("Firebase setup error",e)}}
 </script>
 <script>
 const foods=[
@@ -592,7 +607,25 @@ let selectedFile=null;
 function renderOptions(){const d=$("foodOptions");d.innerHTML="";foods.forEach(f=>{let o=document.createElement("option");o.value=name(f);d.appendChild(o)});$("databaseSummary").textContent=foods.length+" "+T[lang()].items}
 function findFood(s){s=s.trim().toLowerCase();return foods.find(f=>[f.fr,f.ar,f.en].some(n=>n.toLowerCase()===s))}
 function render(){const t=T[lang()],today=new Date().toISOString().slice(0,10),items=journal.filter(x=>x.date===today);$("total").textContent=Math.round(items.reduce((a,x)=>a+x.kcal,0)*10)/10;$("count").textContent=items.length;$("journal").innerHTML="";$("empty").style.display=items.length?"none":"block";items.forEach(x=>{let li=document.createElement("li"),title=document.createElement("div"),detail=document.createElement("div"),b=document.createElement("button");title.className="food-title";title.textContent=x.name;detail.className="food-detail";detail.textContent=x.grams+" g · "+x.kcal+" "+t.kcal;b.className="danger";b.textContent=t.remove;b.onclick=()=>{journal=journal.filter(y=>y.id!==x.id);save();render()};li.append(title,detail,b);$("journal").appendChild(li)})}
-function save(){localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal))}
+function save(){
+  localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal));
+  if(window.caloriaiSaveJournalCloud && window.caloriaiCurrentUser && window.caloriaiCurrentUser()){
+    window.caloriaiSaveJournalCloud(journal).catch(err=>console.warn("Journal cloud save failed",err));
+  }
+}
+window.caloriaiSyncJournal = async function(){
+  if(!window.caloriaiLoadJournalCloud || !window.caloriaiCurrentUser || !window.caloriaiCurrentUser()) return;
+  try{
+    const remote=await window.caloriaiLoadJournalCloud();
+    if(Array.isArray(remote)){
+      journal=remote;
+      localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal));
+      render();
+    }else if(journal.length){
+      await window.caloriaiSaveJournalCloud(journal);
+    }
+  }catch(err){console.warn("Journal cloud sync failed",err)}
+};
 function translate(){let l=lang(),t=T[l];document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";$("photoTitle").textContent=t.photoTitle;$("photoDescription").textContent=t.photoDescription;$("photoLabel").textContent=t.photoLabel;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("analyzePhotoButton").textContent=t.analyze;$("removePhotoButton").textContent=t.removePhoto;if(!selectedFile)$("photoStatus").textContent=t.photoNone;const map={subtitle:"subtitle",welcome:"welcome",cal:"calLabel",meals:"mealLabel",add:"addTitle",search:"searchLabel",grams:"gramsLabel",cal100:"cal100Label",calc:"calcNote",addBtn:"addButton",manual:"manualNote",journal:"journalTitle",empty:"empty",clear:"clearButton",database:"databaseTitle",dbNote:"databaseNote",privacy:"privacyNote"};Object.entries(map).forEach(([k,id])=>$(id).textContent=t[k]);$("foodSearch").placeholder=l==="ar"?"مثال: تفاح، بيض، أرز":l==="en"?"e.g. apple, egg, rice":"Ex. : pomme, œuf, riz";renderOptions();render()}
 $("language").onchange=translate;$("foodSearch").oninput=()=>{let f=findFood($("foodSearch").value);if(f)$("calories100").value=f.k};
 $("addButton").onclick=()=>{let n=$("foodSearch").value.trim(),g=Number($("grams").value),k=Number($("calories100").value);if(!n||g<=0||!Number.isFinite(g)||k<0||!Number.isFinite(k)){alert("Please enter a food, quantity and calories.");return}let f=findFood(n);journal.unshift({id:Date.now(),name:f?name(f):n,grams:g,kcal:Math.round(k*g/100*10)/10,date:new Date().toISOString().slice(0,10)});save();render();$("foodSearch").value="";$("calories100").value="";$("grams").value=100};
@@ -620,9 +653,11 @@ $("analyzePhotoButton").addEventListener("click", async ()=>{
   if(!file){$("photoStatus").textContent=t.photoNeed;return}
   const trialKey="caloriai_trial_photo_analyses_v1";
   const used=Number(localStorage.getItem(trialKey)||0);
-  const paid=localStorage.getItem("caloriai_subscription_active")==="true";
-  if(!paid && used>=5){
-    $("photoStatus").textContent=lang()==="ar"?"انتهت التجربة المجانية: يمكنك تحليل 5 صور فقط. اختر اشتراكًا للمتابعة.":lang()==="en"?"Free trial ended: only 5 photo analyses are included. Choose a subscription to continue.":"Essai terminé : 5 analyses de photos sont incluses. Choisissez un abonnement pour continuer.";
+  const creditKey="caloriai_photo_credits_v1";
+  const credits=Number(localStorage.getItem(creditKey)||0);
+  const trialRemaining=Math.max(0,5-used);
+  if(trialRemaining<=0 && credits<=0){
+    $("photoStatus").textContent=lang()==="ar"?"انتهت الصور التجريبية. اختر باقة تحليلات للمتابعة.":lang()==="en"?"Free trial used. Choose an analysis pack to continue.":"Essai gratuit terminé. Choisissez un pack d’analyses pour continuer.";
     $("subscriptionCard").scrollIntoView({behavior:"smooth",block:"center"}); return;
   }
   const button=$("analyzePhotoButton");
@@ -641,9 +676,12 @@ $("analyzePhotoButton").addEventListener("click", async ()=>{
     if(!response.ok)throw new Error(payload.error||payload.message||("HTTP "+response.status));
     const items=Array.isArray(payload.foods)?payload.foods:(Array.isArray(payload.items)?payload.items:[]);
     if(!items.length)throw new Error("NO_FOODS");
-    if(!paid){localStorage.setItem(trialKey,String(used+1));}
+    if(used<5){localStorage.setItem(trialKey,String(used+1));}
+    else {localStorage.setItem(creditKey,String(Math.max(0,credits-1)));}
     const counter=$("trialCounter");
-    if(counter) counter.textContent=lang()==="ar"?`التجربة المجانية: استُخدمت ${Math.min(5,used+(paid?0:1))} من 5 صور.`:lang()==="en"?`Free trial: ${Math.min(5,used+(paid?0:1))} of 5 photo analyses used.`:`Essai gratuit : ${Math.min(5,used+(paid?0:1))} analyses sur 5 utilisées.`;
+    const updatedTrial=Math.min(5,used+(used<5?1:0));
+    const updatedCredits=Number(localStorage.getItem(creditKey)||0);
+    if(counter) counter.textContent=lang()==="ar"?`التجربة: ${updatedTrial}/5 صور · الرصيد المدفوع: ${updatedCredits} تحليل.`:lang()==="en"?`Free trial: ${updatedTrial}/5 photos · Paid analyses remaining: ${updatedCredits}.`:`Essai : ${updatedTrial}/5 photos · Analyses payantes restantes : ${updatedCredits}.`;
     const box=$("analysisResults");box.style.display="block";
     const heading=document.createElement("h3");heading.textContent=t.totalCalories;box.appendChild(heading);
     items.forEach((food,index)=>{
@@ -673,14 +711,19 @@ $("analyzePhotoButton").addEventListener("click", async ()=>{
   }finally{button.disabled=false;button.style.opacity="1"}
 });
 (function setupSubscriptionUI(){
-  const key="caloriai_trial_photo_analyses_v1";
-  const used=Math.min(5,Number(localStorage.getItem(key)||0));
+  const trialKey="caloriai_trial_photo_analyses_v1";
+  const creditKey="caloriai_photo_credits_v1";
+  const used=Math.min(5,Number(localStorage.getItem(trialKey)||0));
+  const credits=Number(localStorage.getItem(creditKey)||0);
   const counter=document.getElementById("trialCounter");
-  if(counter) counter.textContent=lang()==="ar"?`التجربة المجانية: استُخدمت ${used} من 5 صور.`:lang()==="en"?`Free trial: ${used} of 5 photo analyses used.`:`Essai gratuit : ${used} analyses sur 5 utilisées.`;
+  if(counter) counter.textContent=lang()==="ar"?`التجربة: ${used}/5 صور · الرصيد المدفوع: ${credits} تحليل.`:lang()==="en"?`Free trial: ${used}/5 photos · Paid analyses remaining: ${credits}.`:`Essai : ${used}/5 photos · Analyses payantes restantes : ${credits}.`;
   const note=document.getElementById("paymentSetupNote");
-  function paymentNotConfigured(){if(note)note.textContent=lang()==="ar"?"الأسعار مضافة، لكن الدفع لم يُفعّل بعد. يجب ربط الأزرار بخدمة دفع وإعداد التحقق من الاشتراك على الخادم.":lang()==="en"?"Prices are displayed, but payments are not active yet. Connect a payment provider and verify subscriptions server-side.":"Les tarifs sont affichés, mais le paiement n’est pas encore activé. Reliez un prestataire de paiement et vérifiez les abonnements côté serveur.";}
-  document.getElementById("monthlySubscribeButton")?.addEventListener("click",paymentNotConfigured);
-  document.getElementById("annualSubscribeButton")?.addEventListener("click",paymentNotConfigured);
+  function paymentNotConfigured(e){
+    const credits=e.currentTarget.dataset.credits, price=e.currentTarget.dataset.price;
+    if(note) note.textContent=lang()==="ar"?`اخترت باقة ${credits} تحليل بسعر ${price}. الدفع لم يُفعّل بعد؛ يجب ربط هذا الزر بمزود دفع والتحقق من الدفع على الخادم قبل إضافة الرصيد.`:lang()==="en"?`You selected ${credits} analyses for ${price}. Payments are not enabled yet. Connect a payment provider and verify payment server-side before adding credits.`:`Vous avez choisi ${credits} analyses à ${price}. Le paiement n’est pas encore activé : reliez un prestataire de paiement et vérifiez le paiement côté serveur avant d’ajouter les crédits.`;
+    note.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  document.querySelectorAll(".creditPackButton").forEach(button=>button.addEventListener("click",paymentNotConfigured));
 })();
 $("removePhotoButton").addEventListener("click",()=>{
   if(selectedPhotoUrl){URL.revokeObjectURL(selectedPhotoUrl);selectedPhotoUrl=null}
