@@ -310,9 +310,9 @@ body[data-gender="female"] #onboarding .gender-options .gender-option.female-opt
 <div class="progress-track"><span id="calorieProgress"></span></div>
 <div class="goal-line"><span id="goalLabel">Objectif : 2 000 kcal</span><span class="meal-count"><b id="count">0</b> <span id="mealLabel"></span></span></div>
 <div class="macro-grid">
-  <div class="macro-tile"><span class="macro-icon protein-icon">●</span><span id="proteinLabel">Protéines</span><strong>— g</strong></div>
-  <div class="macro-tile"><span class="macro-icon carb-icon">✳</span><span id="carbLabel">Glucides</span><strong>— g</strong></div>
-  <div class="macro-tile"><span class="macro-icon fat-icon">●</span><span id="fatLabel">Lipides</span><strong>— g</strong></div>
+  <div class="macro-tile"><span class="macro-icon protein-icon">●</span><span id="proteinLabel">Protéines</span><strong id="proteinTotal">0 g</strong></div>
+  <div class="macro-tile"><span class="macro-icon carb-icon">✳</span><span id="carbLabel">Glucides</span><strong id="carbTotal">0 g</strong></div>
+  <div class="macro-tile"><span class="macro-icon fat-icon">●</span><span id="fatLabel">Lipides</span><strong id="fatTotal">0 g</strong></div>
 </div>
 <div class="quick-actions">
   <button type="button" class="quick-action" data-target="photoTitle"><span class="quick-icon">🥗</span><span><b id="quickAddTitle">Ajouter un repas</b><small id="quickAddSub">Photographier ou choisir un aliment</small></span><span class="chevron">›</span></button>
@@ -344,7 +344,7 @@ body[data-gender="female"] #onboarding .gender-options .gender-option.female-opt
 <p id="photoStatus" class="photo-status">Choisissez une photo puis lancez l’analyse.</p>
 <div id="analysisResults" style="display:none;margin-top:14px"></div>
 </section>
-<section class="card"><h2 id="addTitle"></h2><label id="searchLabel" for="foodSearch"></label><input id="foodSearch" list="foodOptions"><datalist id="foodOptions"></datalist><label id="gramsLabel" for="grams"></label><input id="grams" type="number" min="1" value="100"><label id="cal100Label" for="calories100"></label><input id="calories100" type="number" min="0" placeholder="52"><p id="calcNote" class="muted"></p><button id="addButton"></button><p id="manualNote" class="muted"></p></section>
+<section class="card"><h2 id="addTitle"></h2><label id="searchLabel" for="foodSearch"></label><input id="foodSearch" list="foodOptions"><datalist id="foodOptions"></datalist><label id="gramsLabel" for="grams"></label><input id="grams" type="number" min="1" value="100"><label id="cal100Label" for="calories100"></label><input id="calories100" type="number" min="0" placeholder="52"><label for="manualProtein">Protéines / Protein (g pour 100 g)</label><input id="manualProtein" type="number" min="0" step="0.1" value="0"><label for="manualCarbs">Glucides / Carbs (g pour 100 g)</label><input id="manualCarbs" type="number" min="0" step="0.1" value="0"><label for="manualFat">Lipides / Fat (g pour 100 g)</label><input id="manualFat" type="number" min="0" step="0.1" value="0"><p id="calcNote" class="muted"></p><button id="addButton"></button><p id="manualNote" class="muted"></p></section>
 <section class="card"><h2 id="journalTitle"></h2><p id="empty" class="muted"></p><ul id="journal"></ul><button class="secondary" id="clearButton"></button></section>
 <section class="card" id="weightSection">
 <h2 id="weightSectionTitle">⚖️ Poids et évolution</h2>
@@ -530,20 +530,32 @@ window.caloriaiLoadProfile = async () => {
   const snap = await getDoc(doc(db, "users", user.uid));
   return snap.exists() ? snap.data() : null;
 };
-// Journal alimentaire synchronisé dans le cloud, séparément pour chaque compte.
-window.caloriaiSaveJournalCloud = async (entries) => {
+// Cloud persistence for free and purchased photo-analysis credits.
+window.caloriaiLoadCreditsCloud = async () => {
   const user = auth?.currentUser;
   if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
-  await setDoc(doc(db, "users", user.uid, "appData", "journal"), {
-    entries: Array.isArray(entries) ? entries : [],
-    updatedAt: serverTimestamp()
-  }, { merge: true });
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? snap.data() : {};
+  const trialKey = "caloriai_trial_photo_analyses_v1";
+  const creditKey = "caloriai_photo_credits_v1";
+  const localUsed = Math.min(5, Math.max(0, Number(localStorage.getItem(trialKey) || 0)));
+  const localCredits = Math.max(0, Number(localStorage.getItem(creditKey) || 0));
+  const used = Number.isFinite(Number(data.freeAnalysesUsed)) ? Math.min(5, Math.max(0, Number(data.freeAnalysesUsed))) : localUsed;
+  const credits = Number.isFinite(Number(data.paidAnalysesRemaining)) ? Math.max(0, Number(data.paidAnalysesRemaining)) : localCredits;
+  localStorage.setItem(trialKey, String(used));
+  localStorage.setItem(creditKey, String(credits));
+  await setDoc(ref, { freeAnalysesUsed: used, paidAnalysesRemaining: credits, updatedAt: serverTimestamp() }, { merge: true });
+  window.caloriaiUpdateCreditsDisplay?.();
+  return { freeAnalysesUsed: used, paidAnalysesRemaining: credits };
 };
-window.caloriaiLoadJournalCloud = async () => {
+window.caloriaiSaveCreditsCloud = async () => {
   const user = auth?.currentUser;
-  if (!user || !db) return null;
-  const snap = await getDoc(doc(db, "users", user.uid, "appData", "journal"));
-  return snap.exists() && Array.isArray(snap.data().entries) ? snap.data().entries : null;
+  if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
+  const used = Math.min(5, Math.max(0, Number(localStorage.getItem("caloriai_trial_photo_analyses_v1") || 0)));
+  const credits = Math.max(0, Number(localStorage.getItem("caloriai_photo_credits_v1") || 0));
+  await setDoc(doc(db, "users", user.uid), { freeAnalysesUsed: used, paidAnalysesRemaining: credits, updatedAt: serverTimestamp() }, { merge: true });
+  return { freeAnalysesUsed: used, paidAnalysesRemaining: credits };
 };
 window.caloriaiSaveWeightCloud = async (entry) => {
   const user = auth?.currentUser;
@@ -592,7 +604,7 @@ appLangSelect?.addEventListener("change",()=>{if(langSelect)langSelect.value=app
 document.getElementById("accountForm").addEventListener("submit",async e=>{e.preventDefault();const status=document.getElementById("authStatus"),email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,confirm=document.getElementById("accountPasswordConfirm").value;status.textContent="";if(!loginMode&&password!==confirm){status.textContent=t().mismatch;return}if(!setupDone||!auth){status.textContent=t().badConfig;return}const btn=document.getElementById("createAccountButton");btn.disabled=true;try{let credential;if(loginMode){credential=await signInWithEmailAndPassword(auth,email,password)}else{credential=await createUserWithEmailAndPassword(auth,email,password);await updateProfile(credential.user,{displayName:"gender:"+chosenGender});localStorage.setItem("caloriai_gender",chosenGender);status.textContent=t().success}localStorage.setItem("caloriai_email",credential.user.email||email);localStorage.setItem("caloriai_gender",chosenGender||localStorage.getItem("caloriai_gender")||"male");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"})}catch(cloudErr){console.warn("Profile cloud save failed",cloudErr)}showApp()}catch(err){status.textContent=t().errors?.[err.code]||err.message||"Authentication error"}finally{btn.disabled=false}});
 function showApp(){const g=localStorage.getItem("caloriai_gender")||chosenGender||"male";document.body.dataset.gender=g;onboarding.hidden=true;appShell.hidden=false;setTimeout(()=>window.caloriaiRefreshProfile&&window.caloriaiRefreshProfile(),0)}
 if(langSelect && appLangSelect)appLangSelect.value=langSelect.value;paintGender();translateOnboarding();
-if(setupDone){try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,async user=>{if(user){const display=user.displayName||"";if(display.startsWith("gender:")){chosenGender=display.slice(7);localStorage.setItem("caloriai_gender",chosenGender)}localStorage.setItem("caloriai_email",user.email||"");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"});}catch(err){console.warn("Cloud profile save pending; check Firestore setup/rules.",err)}showApp();if(window.caloriaiSyncJournal)await window.caloriaiSyncJournal()}else{onboarding.hidden=false;appShell.hidden=true}})}catch(e){console.error("Firebase setup error",e)}}
+if(setupDone){try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,async user=>{if(user){const display=user.displayName||"";if(display.startsWith("gender:")){chosenGender=display.slice(7);localStorage.setItem("caloriai_gender",chosenGender)}localStorage.setItem("caloriai_email",user.email||"");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"});await window.caloriaiLoadCreditsCloud();}catch(err){console.warn("Cloud profile/credits sync failed; check Firestore rules.",err)}showApp()}else{onboarding.hidden=false;appShell.hidden=true}})}catch(e){console.error("Firebase setup error",e)}}
 </script>
 <script>
 const foods=[
@@ -606,29 +618,11 @@ const $=id=>document.getElementById(id), lang=()=> $("language").value, name=f=>
 let selectedFile=null;
 function renderOptions(){const d=$("foodOptions");d.innerHTML="";foods.forEach(f=>{let o=document.createElement("option");o.value=name(f);d.appendChild(o)});$("databaseSummary").textContent=foods.length+" "+T[lang()].items}
 function findFood(s){s=s.trim().toLowerCase();return foods.find(f=>[f.fr,f.ar,f.en].some(n=>n.toLowerCase()===s))}
-function render(){const t=T[lang()],today=new Date().toISOString().slice(0,10),items=journal.filter(x=>x.date===today);$("total").textContent=Math.round(items.reduce((a,x)=>a+x.kcal,0)*10)/10;$("count").textContent=items.length;$("journal").innerHTML="";$("empty").style.display=items.length?"none":"block";items.forEach(x=>{let li=document.createElement("li"),title=document.createElement("div"),detail=document.createElement("div"),b=document.createElement("button");title.className="food-title";title.textContent=x.name;detail.className="food-detail";detail.textContent=x.grams+" g · "+x.kcal+" "+t.kcal;b.className="danger";b.textContent=t.remove;b.onclick=()=>{journal=journal.filter(y=>y.id!==x.id);save();render()};li.append(title,detail,b);$("journal").appendChild(li)})}
-function save(){
-  localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal));
-  if(window.caloriaiSaveJournalCloud && window.caloriaiCurrentUser && window.caloriaiCurrentUser()){
-    window.caloriaiSaveJournalCloud(journal).catch(err=>console.warn("Journal cloud save failed",err));
-  }
-}
-window.caloriaiSyncJournal = async function(){
-  if(!window.caloriaiLoadJournalCloud || !window.caloriaiCurrentUser || !window.caloriaiCurrentUser()) return;
-  try{
-    const remote=await window.caloriaiLoadJournalCloud();
-    if(Array.isArray(remote)){
-      journal=remote;
-      localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal));
-      render();
-    }else if(journal.length){
-      await window.caloriaiSaveJournalCloud(journal);
-    }
-  }catch(err){console.warn("Journal cloud sync failed",err)}
-};
+function render(){const t=T[lang()],today=new Date().toISOString().slice(0,10),items=journal.filter(x=>x.date===today);$("total").textContent=Math.round(items.reduce((a,x)=>a+(Number(x.kcal)||0),0)*10)/10;$("count").textContent=items.length;const sum=k=>Math.round(items.reduce((a,x)=>a+(Number(x[k])||0),0)*10)/10;$("proteinTotal").textContent=sum("protein")+" g";$("carbTotal").textContent=sum("carbs")+" g";$("fatTotal").textContent=sum("fat")+" g";$("journal").innerHTML="";$("empty").style.display=items.length?"none":"block";items.forEach(x=>{let li=document.createElement("li"),title=document.createElement("div"),detail=document.createElement("div"),b=document.createElement("button");title.className="food-title";title.textContent=x.name;detail.className="food-detail";detail.textContent=x.grams+" g · "+x.kcal+" "+t.kcal+" · P "+(Number(x.protein)||0)+" g · C "+(Number(x.carbs)||0)+" g · F "+(Number(x.fat)||0)+" g";b.className="danger";b.textContent=t.remove;b.onclick=()=>{journal=journal.filter(y=>y.id!==x.id);save();render()};li.append(title,detail,b);$("journal").appendChild(li)})}
+function save(){localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal))}
 function translate(){let l=lang(),t=T[l];document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";$("photoTitle").textContent=t.photoTitle;$("photoDescription").textContent=t.photoDescription;$("photoLabel").textContent=t.photoLabel;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("analyzePhotoButton").textContent=t.analyze;$("removePhotoButton").textContent=t.removePhoto;if(!selectedFile)$("photoStatus").textContent=t.photoNone;const map={subtitle:"subtitle",welcome:"welcome",cal:"calLabel",meals:"mealLabel",add:"addTitle",search:"searchLabel",grams:"gramsLabel",cal100:"cal100Label",calc:"calcNote",addBtn:"addButton",manual:"manualNote",journal:"journalTitle",empty:"empty",clear:"clearButton",database:"databaseTitle",dbNote:"databaseNote",privacy:"privacyNote"};Object.entries(map).forEach(([k,id])=>$(id).textContent=t[k]);$("foodSearch").placeholder=l==="ar"?"مثال: تفاح، بيض، أرز":l==="en"?"e.g. apple, egg, rice":"Ex. : pomme, œuf, riz";renderOptions();render()}
-$("language").onchange=translate;$("foodSearch").oninput=()=>{let f=findFood($("foodSearch").value);if(f)$("calories100").value=f.k};
-$("addButton").onclick=()=>{let n=$("foodSearch").value.trim(),g=Number($("grams").value),k=Number($("calories100").value);if(!n||g<=0||!Number.isFinite(g)||k<0||!Number.isFinite(k)){alert("Please enter a food, quantity and calories.");return}let f=findFood(n);journal.unshift({id:Date.now(),name:f?name(f):n,grams:g,kcal:Math.round(k*g/100*10)/10,date:new Date().toISOString().slice(0,10)});save();render();$("foodSearch").value="";$("calories100").value="";$("grams").value=100};
+$("language").onchange=translate;$("foodSearch").oninput=()=>{let f=findFood($("foodSearch").value);if(f){$("calories100").value=f.k;$("manualProtein").value=Number(f.p)||0;$("manualCarbs").value=Number(f.c)||0;$("manualFat").value=Number(f.f)||0}};
+$("addButton").onclick=()=>{let n=$("foodSearch").value.trim(),g=Number($("grams").value),k=Number($("calories100").value),p=Number($("manualProtein").value),c=Number($("manualCarbs").value),f=Number($("manualFat").value);if(!n||g<=0||!Number.isFinite(g)||k<0||!Number.isFinite(k)||![p,c,f].every(v=>Number.isFinite(v)&&v>=0)){alert("Please enter valid food, quantity, calories and macros.");return}let food=findFood(n),factor=g/100;journal.unshift({id:Date.now(),name:food?name(food):n,grams:g,kcal:Math.round(k*factor*10)/10,protein:Math.round(p*factor*10)/10,carbs:Math.round(c*factor*10)/10,fat:Math.round(f*factor*10)/10,date:new Date().toISOString().slice(0,10)});save();render();$("foodSearch").value="";$("calories100").value="";$("manualProtein").value=0;$("manualCarbs").value=0;$("manualFat").value=0;$("grams").value=100};
 $("clearButton").onclick=()=>{if(confirm(T[lang()].confirm)){let today=new Date().toISOString().slice(0,10);journal=journal.filter(x=>x.date!==today);save();render()}};let selectedPhotoUrl=null;
 $("galleryButton").addEventListener("click",()=>$("foodPhoto").click());
 $("cameraButton").addEventListener("click",()=>$("cameraPhoto").click());
@@ -678,6 +672,8 @@ $("analyzePhotoButton").addEventListener("click", async ()=>{
     if(!items.length)throw new Error("NO_FOODS");
     if(used<5){localStorage.setItem(trialKey,String(used+1));}
     else {localStorage.setItem(creditKey,String(Math.max(0,credits-1)));}
+    try { if(window.caloriaiSaveCreditsCloud) await window.caloriaiSaveCreditsCloud(); }
+    catch(cloudErr) { console.error("Could not save analysis credits to Firebase:", cloudErr); }
     const counter=$("trialCounter");
     const updatedTrial=Math.min(5,used+(used<5?1:0));
     const updatedCredits=Number(localStorage.getItem(creditKey)||0);
@@ -695,14 +691,15 @@ $("analyzePhotoButton").addEventListener("click", async ()=>{
       const gramsInput=document.createElement("input");gramsInput.type="number";gramsInput.min="1";gramsInput.value=grams;
       const calLabel=document.createElement("label");calLabel.textContent=lang()==="ar"?"السعرات الإجمالية":"Total kcal";
       const kcalInput=document.createElement("input");kcalInput.type="number";kcalInput.min="0";kcalInput.value=kcal;
+      const macroInputs=[{key:"protein",label:lang()==="ar"?"البروتينات (غرام)":lang()==="en"?"Protein (g)":"Protéines (g)",value:food.protein_g??food.protein??food.proteins_g??0},{key:"carbs",label:lang()==="ar"?"الكربوهيدرات (غرام)":lang()==="en"?"Carbs (g)":"Glucides (g)",value:food.carbs_g??food.carbohydrates_g??food.carbs??food.carbohydrates??0},{key:"fat",label:lang()==="ar"?"الدهون (غرام)":lang()==="en"?"Fat (g)":"Lipides (g)",value:food.fat_g??food.fats_g??food.fat??food.lipids_g??food.lipids??0}].map(m=>{const l=document.createElement("label");l.textContent=m.label;const input=document.createElement("input");input.type="number";input.min="0";input.step="0.1";input.value=Math.max(0,Number(m.value)||0);return {key:m.key,label:l,input}});
       const add=document.createElement("button");add.textContent=t.addResult;
       add.onclick=()=>{
-        const g=Number(gramsInput.value),c=Number(kcalInput.value);
-        if(!g||g<1||!Number.isFinite(c)||c<0)return;
-        journal.unshift({id:Date.now()+index,name:nm,grams:g,kcal:Math.round(c*10)/10,date:new Date().toISOString().slice(0,10)});
+        const g=Number(gramsInput.value),c=Number(kcalInput.value),macros={};macroInputs.forEach(m=>macros[m.key]=Number(m.input.value));
+        if(!g||g<1||!Number.isFinite(c)||c<0||macroInputs.some(m=>!Number.isFinite(Number(m.input.value))||Number(m.input.value)<0))return;
+        journal.unshift({id:Date.now()+index,name:nm,grams:g,kcal:Math.round(c*10)/10,...macros,date:new Date().toISOString().slice(0,10)});
         save();render();add.textContent=t.addedResult;add.disabled=true;
       };
-      row.append(title,detail,editLabel,gramsInput,calLabel,kcalInput,add);box.appendChild(row);
+      row.append(title,detail,editLabel,gramsInput,calLabel,kcalInput,...macroInputs.flatMap(m=>[m.label,m.input]),add);box.appendChild(row);
     });
     $("photoStatus").textContent=lang()==="ar"?"تم تحليل الصورة. راجع الكميات والسعرات قبل الإضافة.":lang()==="en"?"Image analyzed. Review quantities and calories before adding.":"Photo analysée. Vérifiez les quantités et calories avant l’ajout.";
   }catch(err){
@@ -713,10 +710,13 @@ $("analyzePhotoButton").addEventListener("click", async ()=>{
 (function setupSubscriptionUI(){
   const trialKey="caloriai_trial_photo_analyses_v1";
   const creditKey="caloriai_photo_credits_v1";
-  const used=Math.min(5,Number(localStorage.getItem(trialKey)||0));
-  const credits=Number(localStorage.getItem(creditKey)||0);
-  const counter=document.getElementById("trialCounter");
-  if(counter) counter.textContent=lang()==="ar"?`التجربة: ${used}/5 صور · الرصيد المدفوع: ${credits} تحليل.`:lang()==="en"?`Free trial: ${used}/5 photos · Paid analyses remaining: ${credits}.`:`Essai : ${used}/5 photos · Analyses payantes restantes : ${credits}.`;
+  window.caloriaiUpdateCreditsDisplay=function(){
+    const used=Math.min(5,Math.max(0,Number(localStorage.getItem(trialKey)||0)));
+    const credits=Math.max(0,Number(localStorage.getItem(creditKey)||0));
+    const counter=document.getElementById("trialCounter");
+    if(counter) counter.textContent=lang()==="ar"?`الصور المجانية المستخدمة: ${used}/5 · التحليلات المدفوعة المتبقية: ${credits}.`:lang()==="en"?`Free photos used: ${used}/5 · Paid analyses remaining: ${credits}.`:`Photos gratuites utilisées : ${used}/5 · Analyses payantes restantes : ${credits}.`;
+  };
+  window.caloriaiUpdateCreditsDisplay();
   const note=document.getElementById("paymentSetupNote");
   function paymentNotConfigured(e){
     const credits=e.currentTarget.dataset.credits, price=e.currentTarget.dataset.price;
