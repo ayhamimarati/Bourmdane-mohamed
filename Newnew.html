@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#174b86"><title>CaloriAI Premium</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fc;color:#172033}header{background:white;padding:22px 18px;text-align:center}h1{color:#1677ff;font-size:clamp(25px,6vw,36px)}header p{font-size:18px}main{max-width:720px;margin:auto;padding:16px}.card{background:white;padding:20px;border-radius:22px;margin-bottom:18px;box-shadow:0 4px 18px #15284a0c}h2{font-size:24px}label{display:block;margin:13px 0 7px;font-weight:bold}input,select,button{width:100%;padding:13px;border-radius:12px;border:1px solid #dfe5ee;font-size:16px}button{background:#1677ff;color:white;border:0;font-weight:bold;margin-top:12px}.secondary{background:#e8f1ff;color:#145dcc}.danger{background:#fff0f0;color:#b42318}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:#edf4ff;padding:16px;border-radius:16px}.stat strong{display:block;font-size:28px;color:#1677ff;margin-top:8px}.muted,small{color:#68758a;line-height:1.5}li{padding:12px 0;border-bottom:1px solid #dfe5ee;list-style:none}ul{padding:0}.food-title{font-weight:bold}.food-detail{font-size:14px;color:#68758a;margin:4px 0}.notice{background:#fff8e6;border-radius:12px;padding:12px;color:#795b14}.photo-preview{display:none;width:100%;max-height:320px;object-fit:contain;border-radius:14px;margin-top:12px;background:#f3f6fc}.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.photo-actions button{margin-top:8px}.photo-status{margin-top:10px;font-size:14px;color:#68758a;line-height:1.5}[dir=rtl]{text-align:right}@media(max-width:420px){main{padding:12px}.card{padding:16px}}
+</style>
+<style>
+/* CaloriAI Premium refreshed dashboard */
+:root{--accent:#078bff;--accent-soft:#102f52;--page:#07111f;--panel:#101d2c;--panel2:#142438;--line:rgba(255,255,255,.12);--text:#f4f7fb;--muted:#a4b2c5}
+body{background:radial-gradient(ellipse at top,#102f52 0,#07111f 42%,#060c15 100%);color:var(--text);padding-bottom:82px}
+body[data-gender="male"]{--accent:#078bff;--accent-soft:#0b477d}
+body[data-gender="female"]{--accent:#ec2992;--accent-soft:#6b174c}
+#appShell header{position:relative;overflow:hidden;text-align:left;padding:24px 22px 26px;border-radius:0 0 34px 34px;background:linear-gradient(130deg,var(--accent-soft),var(--accent) 95%);color:#fff;min-height:220px}
+#appShell header:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-55px;top:42px;background:rgba(255,255,255,.10);pointer-events:none}
+#appShell header h1{position:relative;z-index:1;color:#fff!important;font-size:clamp(27px,6vw,36px);margin:10px 0 6px;letter-spacing:-.6px}
+#appShell header p{position:relative;z-index:1;margin:0 0 18px;color:#e1edff;font-size:17px}
+#appShell header select{position:relative;z-index:2;max-width:240px;background:rgba(4,20,40,.22);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:16px}
+#appShell header select option{color:#111}
+#appShell main{max-width:760px;padding:22px 15px 28px}
+#appShell .card{background:linear-gradient(145deg,#121f2e,#0e1825);border:1px solid var(--line);color:var(--text);border-radius:24px;padding:20px;margin-bottom:17px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+#appShell .card h2{color:#f4f7fb;font-size:23px;margin:0 0 18px}
+#appShell .muted,#appShell small,#appShell .food-detail{color:var(--muted)}
+#appShell label{color:#d8e3f1}
+#appShell input,#appShell select{background:#0a1421;color:#f4f7fb;border:1px solid #334458}
+#appShell button{background:var(--accent);color:#fff;border-radius:15px;border:0}
+#appShell button.secondary{background:#26374c!important;color:#dce8ff!important;border:1px solid #40516a!important}
+#appShell button.danger{background:#4b1d2a!important;color:#ffdce4!important}
+.dashboard-card{padding:21px!important}
+.dashboard-card h2{margin-bottom:22px!important}
+.daily-summary{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.calorie-copy>span{color:#a8b6c8;font-size:15px}
+.calorie-number{display:flex;align-items:baseline;gap:7px;margin-top:3px}
+.calorie-number strong{font-size:clamp(42px,12vw,60px);line-height:1.1;color:#fff!important;letter-spacing:-2px}
+.calorie-number small{font-size:16px}
+.remaining-pill{background:color-mix(in srgb,var(--accent) 18%,#182337);border-radius:30px;padding:13px 15px;color:#b9d0ff;font-size:13px;text-align:center;max-width:48%}
+body[data-gender="female"] .remaining-pill{color:#ffc0e2}
+.remaining-pill strong{font-size:16px;display:inline-block;margin-right:4px}
+.progress-track{height:11px;border-radius:20px;background:#2a3441;margin:24px 0 20px;overflow:hidden}
+.progress-track span{display:block;width:0;height:100%;border-radius:20px;background:var(--accent);transition:width .3s ease}
+.goal-line{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#aab8ca;font-size:14px;margin-bottom:20px}
+.meal-count{white-space:nowrap}
+.meal-count b{color:#fff;font-size:17px}
+.macro-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 20px}
+.macro-tile{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:17px;padding:13px 10px;min-width:0}
+.macro-tile>span:nth-child(2){display:block;font-size:13px;color:#b8c5d5;overflow-wrap:anywhere}
+.macro-tile strong{display:block;font-size:20px;color:#fff;margin-top:5px}
+.macro-icon{font-size:18px;display:block;margin-bottom:5px}
+.protein-icon{color:#33aaff}.carb-icon{color:#39df99}.fat-icon{color:#ff9b35}
+.quick-actions{display:grid;gap:10px}
+#appShell .quick-action{display:flex;align-items:center;gap:12px;width:100%;margin:0;text-align:left;padding:12px;border:1px solid var(--line);background:linear-gradient(100deg,#172b40,#102033);color:#f4f7fb}
+.quick-action>span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+.quick-action b{font-size:14px}
+.quick-action small{font-size:12px;white-space:normal}
+.quick-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:color-mix(in srgb,var(--accent) 22%,#102033);font-size:22px}
+.chevron{font-size:25px;color:#b8c7d8}
+.app-footer{padding:15px;text-align:center;color:#73849b;font-size:12px}
+.bottom-nav{position:fixed;z-index:30;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(8,13,21,.96);border-top:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px)}
+#appShell .bottom-nav .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;padding:3px 0;background:transparent;color:#8593a7;border-radius:10px}
+.bottom-nav .nav-item>span{font-size:25px;line-height:1.1}
+.bottom-nav .nav-item small{font-size:11px;color:inherit}
+#appShell .bottom-nav .nav-item.active{color:var(--accent)}
+body[dir="rtl"] #appShell header{text-align:right}
+body[dir="rtl"] #appShell .quick-action{text-align:right}
+body[dir="rtl"] .remaining-pill strong{margin-right:0;margin-left:4px}
+/* Gender onboarding: blue for male, pink for female, matching the selected app theme */
+#onboarding .gender-option{min-height:142px!important;border:2px solid rgba(255,255,255,.22)!important;border-radius:22px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;color:#fff!important}
+#onboarding .gender-option.male-option{background:linear-gradient(145deg,#073c70,#078bff)!important;border-color:#079bff!important;box-shadow:inset 0 0 0 1px #62c9ff22!important}
+#onboarding .gender-option.female-option{background:linear-gradient(145deg,#651343,#ec2992)!important;border-color:#ec2992!important;box-shadow:inset 0 0 0 1px #ff9ad522!important}
+#onboarding .gender-option span{font-size:48px;line-height:1;color:#fff}
+#onboarding .gender-option b{font-size:18px;color:#fff}
+#onboarding .gender-option.selected{transform:translateY(-2px);box-shadow:0 0 0 3px rgba(255,255,255,.18),0 12px 28px rgba(0,0,0,.22)!important;border-color:#fff!important}
+body[data-gender="male"] .onboarding-wrap{background:radial-gradient(circle at top,#0b477d,#071426 68%)}
+body[data-gender="female"] .onboarding-wrap{background:radial-gradient(circle at top,#6b174c,#16091b 68%)}
+body[data-gender="male"] .onboarding-card{border-color:#167fc6}
+body[data-gender="female"] .onboarding-card{border-color:#a72870}
+#onboarding #continueGender{background:linear-gradient(100deg,#078bff,#6045ff)!important}
+body[data-gender="female"] #onboarding #continueGender{background:linear-gradient(100deg,#ec2992,#a52cff)!important}
+@media(max-width:380px){#appShell header{padding:20px 16px 24px}.daily-summary{align-items:flex-start;flex-direction:column}.remaining-pill{max-width:none}.macro-grid{gap:7px}.macro-tile{padding:11px 7px}.macro-tile>span:nth-child(2){font-size:11px}}
+</style>
+
+
+<style>
+.weight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 16px}
+.weight-grid>div{min-width:0}
+.weight-grid>div:last-child{grid-column:1/-1}
+.weight-grid input,#profileSection input{width:100%;box-sizing:border-box;margin-top:6px;padding:12px;border-radius:12px}
+#weightSection label,#profileSection label{display:block;margin-top:12px;font-size:14px}
+.weight-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+.weight-result,.profile-row{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);min-width:0}
+.weight-result span,.profile-row span{font-size:13px;color:var(--muted)}
+.weight-result strong,.profile-row strong{font-size:19px;overflow-wrap:anywhere;color:var(--text)}
+.profile-row{margin:12px 0}
+#profileSection button,#weightSection button{width:100%;margin-top:12px;padding:13px}
+#profileSection h3,#weightSection h3{margin:20px 0 8px}
+.profile-divider{border:0;border-top:1px solid var(--line);margin:20px 0}
+#weightHistory{padding-inline-start:20px}
+#weightHistory li{margin:8px 0;color:var(--text)}
+#weightSection,#profileSection{scroll-margin-top:16px}
+@media(max-width:360px){.weight-grid{grid-template-columns:1fr}.weight-grid>div:last-child{grid-column:auto}}
+</style>
+
+
+<style id="gender-theme-match-reference">
+/* Reference design: male = blue throughout; female = pink throughout. */
+body[data-gender="male"] { --accent:#078bff; --accent-soft:#0b477d; background:radial-gradient(ellipse at top,#0b477d 0%,#07172b 43%,#050b14 100%) !important; }
+body[data-gender="female"] { --accent:#ec2992; --accent-soft:#6b174c; background:radial-gradient(ellipse at top,#6b174c 0%,#210b20 43%,#090710 100%) !important; }
+body[data-gender="male"] #appShell .card { background:linear-gradient(145deg,rgba(9,44,78,.98),rgba(7,24,42,.98)) !important; border-color:rgba(7,139,255,.45) !important; }
+body[data-gender="female"] #appShell .card { background:linear-gradient(145deg,rgba(76,13,55,.98),rgba(29,9,27,.98)) !important; border-color:rgba(236,41,146,.48) !important; }
+body[data-gender="male"] #appShell .macro-tile { background:linear-gradient(145deg,rgba(7,139,255,.14),rgba(7,139,255,.035)) !important; border-color:rgba(7,139,255,.55) !important; }
+body[data-gender="female"] #appShell .macro-tile { background:linear-gradient(145deg,rgba(236,41,146,.16),rgba(236,41,146,.035)) !important; border-color:rgba(236,41,146,.58) !important; }
+body[data-gender="male"] #appShell .remaining-pill { background:linear-gradient(100deg,#078bff,#1767ed) !important; color:#fff !important; }
+body[data-gender="female"] #appShell .remaining-pill { background:linear-gradient(100deg,#ec2992,#c51d83) !important; color:#fff !important; }
+body[data-gender="male"] #appShell .progress-track { background:rgba(7,139,255,.18) !important; }
+body[data-gender="female"] #appShell .progress-track { background:rgba(236,41,146,.20) !important; }
+body[data-gender="male"] #appShell .quick-action { background:linear-gradient(100deg,rgba(7,139,255,.22),rgba(11,71,125,.30)) !important; border-color:rgba(7,139,255,.58) !important; }
+body[data-gender="female"] #appShell .quick-action { background:linear-gradient(100deg,rgba(236,41,146,.24),rgba(107,23,76,.34)) !important; border-color:rgba(236,41,146,.60) !important; }
+body[data-gender="male"] #appShell .bottom-nav .nav-item.active { color:#08baff !important; }
+body[data-gender="female"] #appShell .bottom-nav .nav-item.active { color:#ff36aa !important; }
+body[data-gender="male"] #appShell button.secondary { background:rgba(7,139,255,.18) !important; border:1px solid rgba(7,139,255,.45) !important; color:#d9efff !important; }
+body[data-gender="female"] #appShell button.secondary { background:rgba(236,41,146,.18) !important; border:1px solid rgba(236,41,146,.45) !important; color:#ffe0f2 !important; }
+body[data-gender="male"] #appShell .stat strong { color:#48bdff !important; }
+body[data-gender="female"] #appShell .stat strong { color:#ff65bc !important; }
+/* The male tile stays light green only on the first gender-selection screen. */
+#onboarding .gender-option.male-option, #onboarding .gender-option.male-option.selected { background:linear-gradient(145deg,#d9ffad,#a8ed72) !important; border-color:#b8f28a !important; color:#17351a !important; }
+#onboarding .gender-option.male-option span, #onboarding .gender-option.male-option b { color:#17351a !important; }
+#onboarding .gender-option.female-option, #onboarding .gender-option.female-option.selected { background:linear-gradient(145deg,#651343,#ec2992) !important; border-color:#ec2992 !important; color:#fff !important; }
+#onboarding .gender-option.female-option span, #onboarding .gender-option.female-option b { color:#fff !important; }
+</style>
+
+
+<style id="final-reference-theme">
+/* Exact app-wide reference palette: male blue, female pink; green male tile only on onboarding. */
+body[data-gender="male"]{--accent:#078bff!important;--accent-soft:#0b477d!important;--page:#07111f!important;--panel:#092c4e!important;--panel2:#07182a!important}
+body[data-gender="female"]{--accent:#ec2992!important;--accent-soft:#6b174c!important;--page:#090710!important;--panel:#4c0d37!important;--panel2:#1d091b!important}
+body[data-gender="male"] #appShell{background:radial-gradient(ellipse at top,#0b477d 0%,#07172b 43%,#050b14 100%)!important;color:#f4f7fb!important}
+body[data-gender="female"] #appShell{background:radial-gradient(ellipse at top,#6b174c 0%,#210b20 43%,#090710 100%)!important;color:#fdf4fa!important}
+body[data-gender="male"] #appShell header{background:linear-gradient(130deg,#0b477d,#078bff 95%)!important}
+body[data-gender="female"] #appShell header{background:linear-gradient(130deg,#6b174c,#ec2992 95%)!important}
+body[data-gender="male"] #appShell .card{background:linear-gradient(145deg,rgba(9,44,78,.98),rgba(7,24,42,.98))!important;border-color:rgba(7,139,255,.45)!important;color:#f4f7fb!important}
+body[data-gender="female"] #appShell .card{background:linear-gradient(145deg,rgba(76,13,55,.98),rgba(29,9,27,.98))!important;border-color:rgba(236,41,146,.48)!important;color:#fdf4fa!important}
+body[data-gender="male"] #appShell .card h2,body[data-gender="male"] #appShell h3{color:#f4f7fb!important}
+body[data-gender="female"] #appShell .card h2,body[data-gender="female"] #appShell h3{color:#fff0f8!important}
+body[data-gender="male"] #appShell button:not(.nav-item):not(.danger){background:linear-gradient(100deg,#078bff,#1767ed)!important;color:#fff!important;border-color:rgba(7,139,255,.55)!important}
+body[data-gender="female"] #appShell button:not(.nav-item):not(.danger){background:linear-gradient(100deg,#ec2992,#c51d83)!important;color:#fff!important;border-color:rgba(236,41,146,.6)!important}
+body[data-gender="male"] #appShell button.secondary{background:rgba(7,139,255,.18)!important;border:1px solid rgba(7,139,255,.5)!important;color:#d9efff!important}
+body[data-gender="female"] #appShell button.secondary{background:rgba(236,41,146,.18)!important;border:1px solid rgba(236,41,146,.5)!important;color:#ffe0f2!important}
+body[data-gender="male"] #appShell input,body[data-gender="male"] #appShell select{background:#071523!important;border-color:rgba(7,139,255,.32)!important;color:#f4f7fb!important}
+body[data-gender="female"] #appShell input,body[data-gender="female"] #appShell select{background:#160b19!important;border-color:rgba(236,41,146,.36)!important;color:#fff0f8!important}
+body[data-gender="male"] #appShell input:focus,body[data-gender="male"] #appShell select:focus{outline:2px solid #078bff!important}
+body[data-gender="female"] #appShell input:focus,body[data-gender="female"] #appShell select:focus{outline:2px solid #ec2992!important}
+body[data-gender="male"] #appShell .macro-tile,body[data-gender="male"] #appShell .weight-result,body[data-gender="male"] #appShell .profile-row{background:linear-gradient(145deg,rgba(7,139,255,.13),rgba(7,139,255,.035))!important;border-color:rgba(7,139,255,.38)!important}
+body[data-gender="female"] #appShell .macro-tile,body[data-gender="female"] #appShell .weight-result,body[data-gender="female"] #appShell .profile-row{background:linear-gradient(145deg,rgba(236,41,146,.15),rgba(236,41,146,.035))!important;border-color:rgba(236,41,146,.42)!important}
+body[data-gender="male"] #appShell .remaining-pill{background:linear-gradient(100deg,#078bff,#1767ed)!important;color:#fff!important}
+body[data-gender="female"] #appShell .remaining-pill{background:linear-gradient(100deg,#ec2992,#c51d83)!important;color:#fff!important}
+body[data-gender="male"] #appShell .progress-track{background:rgba(7,139,255,.2)!important}
+body[data-gender="female"] #appShell .progress-track{background:rgba(236,41,146,.22)!important}
+body[data-gender="male"] #appShell .progress-track span{background:#078bff!important}
+body[data-gender="female"] #appShell .progress-track span{background:#ec2992!important}
+body[data-gender="male"] #appShell .quick-action{background:linear-gradient(100deg,rgba(7,139,255,.22),rgba(11,71,125,.32))!important;border-color:rgba(7,139,255,.58)!important}
+body[data-gender="female"] #appShell .quick-action{background:linear-gradient(100deg,rgba(236,41,146,.24),rgba(107,23,76,.34))!important;border-color:rgba(236,41,146,.6)!important}
+body[data-gender="male"] #appShell .quick-icon{background:rgba(7,139,255,.22)!important}
+body[data-gender="female"] #appShell .quick-icon{background:rgba(236,41,146,.24)!important}
+body[data-gender="male"] #appShell .bottom-nav{background:rgba(5,13,24,.97)!important;border-top-color:rgba(7,139,255,.28)!important}
+body[data-gender="female"] #appShell .bottom-nav{background:rgba(15,5,15,.97)!important;border-top-color:rgba(236,41,146,.3)!important}
+body[data-gender="male"] #appShell .bottom-nav .nav-item.active{color:#08baff!important}
+body[data-gender="female"] #appShell .bottom-nav .nav-item.active{color:#ff36aa!important}
+body[data-gender="male"] #appShell .stat strong,body[data-gender="male"] #appShell .weight-result strong{color:#48bdff!important}
+body[data-gender="female"] #appShell .stat strong,body[data-gender="female"] #appShell .weight-result strong{color:#ff65bc!important}
+body[data-gender="male"] #appShell .app-footer{color:#8dbbe7!important}
+body[data-gender="female"] #appShell .app-footer{color:#d99ac3!important}
+/* Male green selection tile is intentionally limited to onboarding; it does not theme the app. */
+#onboarding .gender-option.male-option,#onboarding .gender-option.male-option.selected{background:linear-gradient(145deg,#d9ffad,#a8ed72)!important;border-color:#b8f28a!important;color:#17351a!important}
+#onboarding .gender-option.male-option span,#onboarding .gender-option.male-option b{color:#17351a!important}
+#onboarding .gender-option.female-option,#onboarding .gender-option.female-option.selected{background:linear-gradient(145deg,#651343,#ec2992)!important;border-color:#ec2992!important;color:#fff!important}
+#onboarding .gender-option.female-option span,#onboarding .gender-option.female-option b{color:#fff!important}
+</style>
+
+
+<style id="gender-hero-and-nav-interaction">
+/* Portrait header matching the selected gender */
+#appShell header{position:relative;isolation:isolate;min-height:238px!important;padding:24px 18px 22px!important;overflow:hidden}
+#appShell header:after{display:none!important}
+#appShell header .gender-hero{position:absolute;z-index:0;right:0;bottom:0;width:48%;height:100%;object-fit:cover;object-position:center top;pointer-events:none;opacity:.98;mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.32) 14%,#000 38%);-webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.32) 14%,#000 38%)}
+#appShell header .female-hero{display:none}
+body[data-gender="female"] #appShell header .male-hero{display:none}
+body[data-gender="female"] #appShell header .female-hero{display:block}
+body[data-gender="male"] #appShell header .male-hero{display:block}
+#appShell header h1,#appShell header p,#appShell header select{position:relative;z-index:2;max-width:62%}
+#appShell header h1{font-size:clamp(20px,5.5vw,29px)!important;line-height:1.12;overflow-wrap:anywhere}
+#appShell header p{font-size:14px!important;line-height:1.35;max-width:60%}
+#appShell header select{width:100%;max-width:185px!important;font-size:14px;padding:10px 12px}
+#appShell .bottom-nav .nav-item{transition:color .18s ease,background .18s ease,transform .18s ease;min-height:48px}
+body[data-gender="male"] #appShell .bottom-nav .nav-item.active{color:#08c8ff!important;background:linear-gradient(180deg,rgba(7,139,255,.20),rgba(7,139,255,.04))!important;box-shadow:inset 0 0 0 1px rgba(7,139,255,.28),0 -2px 0 #08baff}
+body[data-gender="female"] #appShell .bottom-nav .nav-item.active{color:#ff36aa!important;background:linear-gradient(180deg,rgba(236,41,146,.22),rgba(236,41,146,.04))!important;box-shadow:inset 0 0 0 1px rgba(236,41,146,.30),0 -2px 0 #ff36aa}
+#appShell .bottom-nav .nav-item:active{transform:scale(.96)}
+#appShell .bottom-nav .nav-item.active>span{filter:drop-shadow(0 0 5px currentColor)}
+#appShell .bottom-nav .nav-item.active small{color:inherit!important;font-weight:700}
+@media(max-width:380px){
+ #appShell header{min-height:225px!important;padding:20px 14px 20px!important}
+ #appShell header .gender-hero{width:47%}
+ #appShell header h1{font-size:20px!important;max-width:64%}
+ #appShell header p{font-size:13px!important;max-width:61%}
+ #appShell header select{max-width:155px!important;padding:9px 8px}
+}
+</style>
+
+
+<style id="gender-buttons-final-fix">
+/* Les boutons restent blancs tant qu'ils ne sont pas sélectionnés. */
+#onboarding .gender-options .gender-option,
+#onboarding .gender-options .gender-option.male-option,
+#onboarding .gender-options .gender-option.female-option {
+  background: #fff !important;
+  background-image: none !important;
+  color: #1b2638 !important;
+  border: 2px solid rgba(255,255,255,.85) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+#onboarding .gender-options .gender-option span,
+#onboarding .gender-options .gender-option b {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #1b2638 !important;
+}
+/* Le bouton homme devient bleu uniquement après le clic. */
+#onboarding .gender-options .gender-option.male-option.selected {
+  background: #078bff !important;
+  background-image: none !important;
+  border-color: #078bff !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(7,139,255,.22) !important;
+}
+/* Le bouton femme devient rose uniquement après le clic. */
+#onboarding .gender-options .gender-option.female-option.selected {
+  background: #ec2992 !important;
+  background-image: none !important;
+  border-color: #ec2992 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(236,41,146,.22) !important;
+}
+#onboarding .gender-options .gender-option.male-option.selected span,
+#onboarding .gender-options .gender-option.male-option.selected b,
+#onboarding .gender-options .gender-option.female-option.selected span,
+#onboarding .gender-options .gender-option.female-option.selected b {
+  background: transparent !important;
+  color: #fff !important;
+}
+</style>
+
+
+<style id="caloriai-gender-buttons-definitive-fix">
+/* Gender selection: neutral white buttons until clicked; no colored background behind text. */
+#onboarding .gender-options .gender-option,
+#onboarding .gender-options .gender-option.male-option,
+#onboarding .gender-options .gender-option.female-option,
+#onboarding .gender-options .gender-option.male-option:not(.selected),
+#onboarding .gender-options .gender-option.female-option:not(.selected),
+body[data-gender="male"] #onboarding .gender-options .gender-option:not(.selected),
+body[data-gender="female"] #onboarding .gender-options .gender-option:not(.selected) {
+  background: linear-gradient(145deg, #e5ffd0, #c8f5a5) !important;
+  background-image: none !important;
+  color: #1b2638 !important;
+  border: 2px solid rgba(255,255,255,.85) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  outline: none !important;
+}
+#onboarding .gender-options .gender-option span,
+#onboarding .gender-options .gender-option b {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #1b2638 !important;
+  text-shadow: none !important;
+}
+#onboarding .gender-options .gender-option.male-option.selected,
+body[data-gender="male"] #onboarding .gender-options .gender-option.male-option.selected {
+  background: #078bff !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: #078bff !important;
+  box-shadow: 0 0 0 3px rgba(7,139,255,.22) !important;
+}
+#onboarding .gender-options .gender-option.female-option.selected,
+body[data-gender="female"] #onboarding .gender-options .gender-option.female-option.selected {
+  background: #ec2992 !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: #ec2992 !important;
+  box-shadow: 0 0 0 3px rgba(236,41,146,.22) !important;
+}
+#onboarding .gender-options .gender-option.male-option.selected span,
+#onboarding .gender-options .gender-option.male-option.selected b,
+#onboarding .gender-options .gender-option.female-option.selected span,
+#onboarding .gender-options .gender-option.female-option.selected b {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #fff !important;
+}
+</style>
+
+</head><body>
+<div id="appShell" hidden><header><img class="gender-hero male-hero" alt="" aria-hidden="true" src="data:image/jpeg;base64,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"><img class="gender-hero female-hero" alt="" aria-hidden="true" src="data:image/jpeg;base64,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"><h1>🥗 CaloriAI Premium</h1><p id="subtitle"></p><select id="language" aria-label="Language"><option value="fr">Français</option><option value="ar">العربية</option><option value="en">English</option></select></header>
+<main>
+<section class="card dashboard-card" id="dashboardHome">
+<h2 id="welcome"></h2>
+<div class="daily-summary">
+  <div class="calorie-copy"><span id="calLabel"></span><div class="calorie-number"><strong id="total">0</strong><small>kcal</small></div></div>
+  <div class="remaining-pill"><strong id="remainingCalories">2 000</strong><span id="remainingLabel">kcal restantes</span></div>
+</div>
+<div class="progress-track"><span id="calorieProgress"></span></div>
+<div class="goal-line"><span id="goalLabel">Objectif : 2 000 kcal</span><span class="meal-count"><b id="count">0</b> <span id="mealLabel"></span></span></div>
+<div class="macro-grid">
+  <div class="macro-tile"><span class="macro-icon protein-icon">●</span><span id="proteinLabel">Protéines</span><strong id="proteinTotal">0 g</strong></div>
+  <div class="macro-tile"><span class="macro-icon carb-icon">✳</span><span id="carbLabel">Glucides</span><strong id="carbTotal">0 g</strong></div>
+  <div class="macro-tile"><span class="macro-icon fat-icon">●</span><span id="fatLabel">Lipides</span><strong id="fatTotal">0 g</strong></div>
+</div>
+<div class="quick-actions">
+  <button type="button" class="quick-action" data-target="photoTitle"><span class="quick-icon">🥗</span><span><b id="quickAddTitle">Ajouter un repas</b><small id="quickAddSub">Photographier ou choisir un aliment</small></span><span class="chevron">›</span></button>
+  <button type="button" class="quick-action" data-target="journalTitle"><span class="quick-icon">📈</span><span><b id="quickJournalTitle">Progression</b><small id="quickJournalSub">Consulter votre journal alimentaire</small></span><span class="chevron">›</span></button>
+  <button type="button" class="quick-action" data-target="databaseTitle"><span class="quick-icon">🎯</span><span><b id="quickGoalTitle">Objectif</b><small id="quickGoalSub">Suivre votre objectif quotidien</small></span><span class="chevron">›</span></button>
+</div>
+</section>
+<section class="card" id="subscriptionCard">
+<h2 id="subscriptionTitle">🌟 Abonnement CaloriAI Premium</h2>
+<p id="trialCounter" class="notice">Essai gratuit : 5 analyses de photos au total.</p>
+<div class="stats"><div class="stat"><span>Pack Découverte</span><strong>$1.99</strong><small>20 analyses de photos</small><button type="button" class="creditPackButton" data-credits="20" data-price="$1.99">Choisir 20 analyses</button></div><div class="stat"><span>Pack Essentiel</span><strong>$3.99</strong><small>50 analyses de photos</small><button type="button" class="creditPackButton" data-credits="50" data-price="$3.99">Choisir 50 analyses</button></div><div class="stat"><span>Pack Premium</span><strong>$5.99</strong><small>100 analyses de photos</small><button type="button" class="creditPackButton" data-credits="100" data-price="$5.99">Choisir 100 analyses</button></div><div class="stat"><span>Pack Max</span><strong>$9.99</strong><small>200 analyses de photos</small><button type="button" class="creditPackButton" data-credits="200" data-price="$9.99">Choisir 200 analyses</button></div></div>
+<p id="paymentSetupNote" class="muted">Les paiements doivent être activés en reliant ces boutons à votre fournisseur de paiement.</p>
+</section>
+<section class="card">
+<h2 id="photoTitle">📸 Photographier un repas</h2>
+<p id="photoDescription" class="muted">Prenez une photo de votre plat ou choisissez une image dans votre galerie.</p>
+<label id="photoLabel">Photo du repas</label>
+<div class="photo-actions">
+<button type="button" id="galleryButton">🖼️ Choisir dans la galerie</button>
+<button type="button" id="cameraButton">📷 Prendre une photo</button>
+</div>
+<input id="foodPhoto" type="file" accept="image/*" hidden>
+<input id="cameraPhoto" type="file" accept="image/*" capture="environment" hidden>
+<img id="photoPreview" class="photo-preview" alt="Aperçu de la photo du repas">
+<div class="photo-actions">
+<button type="button" id="analyzePhotoButton">Analyser la photo</button>
+<button type="button" class="secondary" id="removePhotoButton">Retirer la photo</button>
+</div>
+<p id="photoStatus" class="photo-status">Choisissez une photo puis lancez l’analyse.</p>
+<div id="analysisResults" style="display:none;margin-top:14px"></div>
+</section>
+<section class="card"><h2 id="addTitle"></h2><label id="searchLabel" for="foodSearch"></label><input id="foodSearch" list="foodOptions"><datalist id="foodOptions"></datalist><label id="gramsLabel" for="grams"></label><input id="grams" type="number" min="1" value="100"><label id="cal100Label" for="calories100"></label><input id="calories100" type="number" min="0" placeholder="52"><label for="manualProtein">Protéines / Protein (g pour 100 g)</label><input id="manualProtein" type="number" min="0" step="0.1" value="0"><label for="manualCarbs">Glucides / Carbs (g pour 100 g)</label><input id="manualCarbs" type="number" min="0" step="0.1" value="0"><label for="manualFat">Lipides / Fat (g pour 100 g)</label><input id="manualFat" type="number" min="0" step="0.1" value="0"><p id="calcNote" class="muted"></p><button id="addButton"></button><p id="manualNote" class="muted"></p></section>
+<section class="card"><h2 id="journalTitle"></h2><p id="empty" class="muted"></p><ul id="journal"></ul><button class="secondary" id="clearButton"></button></section>
+<section class="card" id="weightSection">
+<h2 id="weightSectionTitle">⚖️ Poids et évolution</h2>
+<p id="weightIntro" class="muted">Enregistrez votre poids pour suivre votre évolution.</p>
+<div class="weight-grid">
+  <div><label id="currentWeightLabel" for="currentWeight">Poids actuel (kg)</label><input id="currentWeight" type="number" min="20" max="400" step="0.1" inputmode="decimal" placeholder="70,0"></div>
+  <div><label id="heightLabel" for="userHeight">Taille (cm)</label><input id="userHeight" type="number" min="80" max="250" step="0.5" inputmode="decimal" placeholder="170"></div>
+  <div><label id="targetWeightLabel" for="targetWeight">Poids cible (kg)</label><input id="targetWeight" type="number" min="20" max="400" step="0.1" inputmode="decimal" placeholder="65,0"></div>
+</div>
+<button type="button" id="saveWeightButton">Enregistrer les informations</button>
+<div class="weight-results">
+  <div class="weight-result"><span id="latestWeightLabel">Dernier poids</span><strong id="latestWeightValue">— kg</strong></div>
+  <div class="weight-result"><span id="bmiLabel">IMC indicatif</span><strong id="bmiValue">—</strong></div>
+</div>
+<p id="weightStatus" class="muted" role="status"></p>
+<h3 id="weightHistoryTitle">Historique du poids</h3><ul id="weightHistory"></ul>
+</section>
+<section class="card" id="profileSection">
+<h2 id="profileTitle">⚙️ Profil et compte</h2>
+<p class="muted" id="profileDescription">Informations de votre compte connecté.</p>
+<div class="profile-row"><span id="profileEmailLabel">Adresse e-mail</span><strong id="profileEmailValue">—</strong></div>
+<div class="profile-row"><span id="profileGenderLabel">Sexe choisi</span><strong id="profileGenderValue">—</strong></div>
+<button type="button" class="secondary" id="resetPasswordButton">Mot de passe oublié ? Recevoir un lien par e-mail</button>
+<p id="resetPasswordStatus" class="muted" role="status"></p>
+<hr class="profile-divider">
+<h3 id="changePasswordTitle">Changer le mot de passe</h3>
+<label id="currentPasswordLabel" for="profileCurrentPassword">Mot de passe actuel</label><input id="profileCurrentPassword" type="password" autocomplete="current-password">
+<label id="newPasswordLabel" for="profileNewPassword">Nouveau mot de passe (6 caractères minimum)</label><input id="profileNewPassword" type="password" autocomplete="new-password" minlength="6">
+<label id="confirmNewPasswordLabel" for="profileConfirmNewPassword">Confirmer le nouveau mot de passe</label><input id="profileConfirmNewPassword" type="password" autocomplete="new-password" minlength="6">
+<button type="button" id="changePasswordButton">Changer le mot de passe</button>
+<p id="changePasswordStatus" class="muted" role="status"></p>
+<button type="button" class="secondary" id="signOutButton">Se déconnecter</button>
+</section>
+<section class="card"><h2 id="databaseTitle"></h2><p id="databaseNote" class="muted"></p><div id="databaseSummary" class="muted"></div></section><p id="privacyNote" class="notice"></p></main><footer class="app-footer">CaloriAI Premium · Premium</footer>
+<nav class="bottom-nav" aria-label="Navigation principale">
+  <button type="button" class="nav-item active" data-target="dashboardHome"><span>⌂</span><small id="navHome">Accueil</small></button>
+  <button type="button" class="nav-item" data-target="photoTitle"><span>＋</span><small id="navAdd">Ajouter</small></button>
+  <button type="button" class="nav-item" data-target="weightSection"><span>⚖</span><small id="navWeight">Poids</small></button>
+  <button type="button" class="nav-item" data-target="profileSection"><span>⚙</span><small id="navProfile">Profil</small></button>
+</nav></div>
+
+<section id="onboarding" class="onboarding-wrap">
+  <div class="onboarding-card">
+    <div class="brand-mark">🥗</div><h1>CaloriAI Premium</h1>
+    <label class="language-label" for="onboardingLanguage">🌐 <span id="languageLabel">Langue</span></label>
+    <select id="onboardingLanguage" class="onboarding-language" aria-label="Language"><option value="fr">Français</option><option value="ar">العربية</option><option value="en">English</option></select>
+    <p id="onboardSubtitle">اختَر الجنس أولاً لتخصيص ألوان التطبيق</p>
+    <div id="genderStep">
+      <h2 id="genderTitle">اختَر الجنس</h2>
+      <div class="gender-options">
+        <button type="button" class="gender-option male-option" data-gender="male" aria-pressed="false"><span>♂</span><b id="maleLabel">ذكر</b></button>
+        <button type="button" class="gender-option female-option" data-gender="female" aria-pressed="false"><span>♀</span><b id="femaleLabel">أنثى</b></button>
+      </div>
+      <button type="button" id="continueGender" disabled>متابعة</button>
+    </div>
+    <form id="accountForm" hidden>
+      <h2 id="accountTitle">إنشاء حساب بالبريد الإلكتروني</h2>
+      <p id="accountHint" class="muted">أنشئ حساباً لحفظ الدخول إلى التطبيق.</p>
+      <label id="emailLabel" for="accountEmail">البريد الإلكتروني</label><input id="accountEmail" type="email" autocomplete="email" required placeholder="name@example.com">
+      <label id="passwordLabel" for="accountPassword">كلمة المرور</label><input id="accountPassword" type="password" autocomplete="new-password" minlength="6" required>
+      <label id="confirmPasswordLabel" for="accountPasswordConfirm">تأكيد كلمة المرور</label><input id="accountPasswordConfirm" type="password" autocomplete="new-password" minlength="6" required>
+      <button id="createAccountButton" type="submit">إنشاء حساب</button>
+      <button id="showLoginButton" class="secondary" type="button">لدي حساب بالفعل — تسجيل الدخول</button>
+      <button id="backGenderButton" class="plain-button" type="button">رجوع لاختيار الجنس</button>
+    </form>
+    <p id="authStatus" class="auth-status" role="status"></p>
+    <p id="firebaseSetupNote" class="setup-note">يتطلب تفعيل تسجيل الدخول بالبريد الإلكتروني في Firebase مرة واحدة.</p>
+  </div>
+</section>
+<style>
+[hidden]{display:none!important}
+.onboarding-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at top,#174b86,#071426 65%);color:#f7fbff}
+.onboarding-card{width:min(100%,440px);padding:26px 22px;border:1px solid #2c4c72;border-radius:28px;background:linear-gradient(155deg,#102944,#09182a 75%);box-shadow:0 22px 60px #0005;text-align:center}
+.brand-mark{font-size:48px}.onboarding-card h1{margin:6px 0 8px;color:#eaf5ff;font-size:30px}.onboarding-card>p{line-height:1.6;color:#c3d5e8}.onboarding-card h2{font-size:21px}
+.gender-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.gender-option{min-height:125px!important;background:linear-gradient(145deg,#baff78,#83e64d)!important;color:#17351a!important;border:2px solid #a8ef65!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:none!important}
+.gender-option span{font-size:44px;line-height:1}
+.gender-option.selected{background:linear-gradient(145deg,#c8ff91,#8ee94f)!important;border-color:#d5ff9d!important;box-shadow:0 0 0 3px #a8efb420!important;color:#17351a!important}
+.onboarding-card button:disabled{opacity:.45}.onboarding-card input,.onboarding-language{background:#08182a;color:#fff;border-color:#35516e}.onboarding-language{margin:0 auto 18px;max-width:250px;text-align:center}.language-label{display:block;margin:12px 0 6px;text-align:center!important;color:#dceaff!important}.onboarding-card label{text-align:start;color:#dceaff}
+.auth-status{min-height:24px;color:#ffd6a3;font-size:14px}.setup-note{font-size:12px!important;color:#91a9c3!important}.plain-button{background:transparent!important;color:#c2d4e8!important;border:1px solid #3b526d!important}.secondary{background:#e5eef9!important;color:#174477!important}
+body[data-gender="male"]{--accent:#078bff;--soft:#e6f4ff}body[data-gender="female"]{--accent:#ec2992;--soft:#fff0f8}
+body[data-gender="male"] h1,body[data-gender="male"] .stat strong{color:#078bff}body[data-gender="female"] h1,body[data-gender="female"] .stat strong{color:#ec2992}
+body[data-gender="female"] button:not(.danger){background:#ec2992}body[data-gender="female"] .stat{background:#fff0f8}body[data-gender="female"] .secondary{background:#ffe0f0!important;color:#9d145d!important}
+body[data-gender="male"] button:not(.danger){background:#078bff}body[data-gender="male"] .stat{background:#e6f4ff}
+body[data-gender="male"] .gender-option,body[data-gender="female"] .gender-option{background:linear-gradient(145deg,#baff78,#83e64d)!important;color:#17351a!important;border-color:#a8ef65!important}
+body[data-gender="male"] .gender-option.selected,body[data-gender="female"] .gender-option.selected{background:linear-gradient(145deg,#c8ff91,#8ee94f)!important;color:#17351a!important;border-color:#d5ff9d!important}
+
+/* Final gender theme: green male choice on onboarding, blue male app, pink female app */
+#onboarding .gender-option.male-option,
+#onboarding .gender-option.male-option.selected {
+  background: linear-gradient(145deg,#d9ffad,#a8ed72) !important;
+  color: #17351a !important;
+  border-color: #b8f28a !important;
+  box-shadow: 0 0 0 2px rgba(184,242,138,.18) !important;
+}
+#onboarding .gender-option.male-option span,
+#onboarding .gender-option.male-option b { color:#17351a !important; }
+#onboarding .gender-option.female-option,
+#onboarding .gender-option.female-option.selected {
+  background: linear-gradient(145deg,#651343,#ec2992) !important;
+  color:#fff !important;
+  border-color:#ec2992 !important;
+  box-shadow: 0 0 0 2px rgba(236,41,146,.18) !important;
+}
+#onboarding .gender-option.female-option span,
+#onboarding .gender-option.female-option b { color:#fff !important; }
+#onboarding .gender-option.selected { transform:translateY(-2px); outline:2px solid rgba(255,255,255,.75); }
+/* Apply the chosen accent consistently throughout the app, not only the header. */
+body[data-gender="male"] #appShell { --accent:#078bff; --accent-soft:#0b477d; }
+body[data-gender="female"] #appShell { --accent:#ec2992; --accent-soft:#6b174c; }
+body[data-gender="male"] #appShell .quick-action { border-color:rgba(7,139,255,.28); }
+body[data-gender="female"] #appShell .quick-action { border-color:rgba(236,41,146,.30); }
+body[data-gender="male"] #appShell .progress-track span { background:#078bff; }
+body[data-gender="female"] #appShell .progress-track span { background:#ec2992; }
+body[data-gender="male"] #appShell .bottom-nav .nav-item.active { color:#078bff; }
+body[data-gender="female"] #appShell .bottom-nav .nav-item.active { color:#ec2992; }
+body[data-gender="male"] #appShell .quick-icon { background:rgba(7,139,255,.20); }
+body[data-gender="female"] #appShell .quick-icon { background:rgba(236,41,146,.20); }
+
+</style>
+
+<style id="gender-theme-final">
+/* Final consistent theme: male = blue, female = pink throughout the app. */
+body[data-gender="male"] #appShell { --accent:#078bff; --accent-soft:#0b477d; }
+body[data-gender="female"] #appShell { --accent:#ec2992; --accent-soft:#6b174c; }
+body[data-gender="male"] #appShell header { background:linear-gradient(130deg,#0b477d,#078bff 95%) !important; }
+body[data-gender="female"] #appShell header { background:linear-gradient(130deg,#6b174c,#ec2992 95%) !important; }
+body[data-gender="male"] #appShell button:not(.secondary):not(.danger) { background:linear-gradient(100deg,#078bff,#1767ed) !important; }
+body[data-gender="female"] #appShell button:not(.secondary):not(.danger) { background:linear-gradient(100deg,#ec2992,#c51d83) !important; }
+body[data-gender="male"] #appShell .card { border-color:rgba(7,139,255,.20); }
+body[data-gender="female"] #appShell .card { border-color:rgba(236,41,146,.23); }
+body[data-gender="male"] #appShell .stat, body[data-gender="male"] #appShell .weight-result, body[data-gender="male"] #appShell .profile-row { border-color:rgba(7,139,255,.25); }
+body[data-gender="female"] #appShell .stat, body[data-gender="female"] #appShell .weight-result, body[data-gender="female"] #appShell .profile-row { border-color:rgba(236,41,146,.28); }
+body[data-gender="male"] #appShell .quick-action { background:linear-gradient(100deg,rgba(7,139,255,.18),rgba(11,71,125,.24)) !important; border-color:rgba(7,139,255,.48) !important; }
+body[data-gender="female"] #appShell .quick-action { background:linear-gradient(100deg,rgba(236,41,146,.20),rgba(107,23,76,.28)) !important; border-color:rgba(236,41,146,.48) !important; }
+body[data-gender="male"] #appShell .quick-icon { background:rgba(7,139,255,.22) !important; color:#62c9ff; }
+body[data-gender="female"] #appShell .quick-icon { background:rgba(236,41,146,.22) !important; color:#ff8bc9; }
+body[data-gender="male"] #appShell .progress-track span { background:#078bff !important; }
+body[data-gender="female"] #appShell .progress-track span { background:#ec2992 !important; }
+body[data-gender="male"] #appShell .bottom-nav .nav-item.active { color:#078bff !important; }
+body[data-gender="female"] #appShell .bottom-nav .nav-item.active { color:#ec2992 !important; }
+body[data-gender="male"] #appShell input:focus, body[data-gender="male"] #appShell select:focus { outline:2px solid rgba(7,139,255,.5); border-color:#078bff !important; }
+body[data-gender="female"] #appShell input:focus, body[data-gender="female"] #appShell select:focus { outline:2px solid rgba(236,41,146,.5); border-color:#ec2992 !important; }
+/* Only the male selection tile on the first screen is light green. */
+#onboarding .gender-option.male-option, #onboarding .gender-option.male-option.selected { background:linear-gradient(145deg,#d9ffad,#a8ed72) !important; color:#17351a !important; border-color:#b8f28a !important; }
+#onboarding .gender-option.male-option span, #onboarding .gender-option.male-option b { color:#17351a !important; }
+#onboarding .gender-option.female-option, #onboarding .gender-option.female-option.selected { background:linear-gradient(145deg,#651343,#ec2992) !important; color:#fff !important; border-color:#ec2992 !important; }
+#onboarding .gender-option.female-option span, #onboarding .gender-option.female-option b { color:#fff !important; }
+</style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile, sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+// Remplace ces valeurs par la configuration de ton projet Firebase.
+const firebaseConfig = { apiKey: "AIzaSyBlvmFMtchqne_jUs7x0sUr5gfvtzaUXt8", authDomain: "ayham-ad467.firebaseapp.com", projectId: "ayham-ad467", storageBucket: "ayham-ad467.firebasestorage.app", messagingSenderId: "436656153733", appId: "1:436656153733:web:ebc8466bcf714ad299f5ec", measurementId: "G-G7FV4FELQP" };
+const setupDone = firebaseConfig.apiKey !== "REMPLACER_API_KEY" && firebaseConfig.projectId !== "REMPLACER_PROJECT_ID" && firebaseConfig.appId !== "REMPLACER_APP_ID";
+let db = null;
+window.caloriaiCurrentUser = () => auth?.currentUser || null;
+window.caloriaiResetPassword = async (email) => {
+  if (!auth) throw new Error("Firebase Authentication n'est pas initialisé.");
+  return sendPasswordResetEmail(auth, email);
+};
+window.caloriaiChangePassword = async (currentPassword, newPassword) => {
+  const user = auth?.currentUser;
+  if (!user || !user.email) throw new Error("Aucun utilisateur connecté.");
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user, credential);
+  return updatePassword(user, newPassword);
+};
+window.caloriaiSignOut = () => auth ? signOut(auth) : Promise.resolve();
+window.caloriaiSaveProfile = async (profile) => {
+  const user = auth?.currentUser;
+  if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
+  await setDoc(doc(db, "users", user.uid), {
+    email: user.email || "",
+    gender: profile.gender || localStorage.getItem("caloriai_gender") || "male",
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+};
+window.caloriaiLoadProfile = async () => {
+  const user = auth?.currentUser;
+  if (!user || !db) return null;
+  const snap = await getDoc(doc(db, "users", user.uid));
+  return snap.exists() ? snap.data() : null;
+};
+// Cloud persistence for free and purchased photo-analysis credits.
+window.caloriaiLoadCreditsCloud = async () => {
+  const user = auth?.currentUser;
+  if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? snap.data() : {};
+  const trialKey = "caloriai_trial_photo_analyses_v1";
+  const creditKey = "caloriai_photo_credits_v1";
+  const localUsed = Math.min(5, Math.max(0, Number(localStorage.getItem(trialKey) || 0)));
+  const localCredits = Math.max(0, Number(localStorage.getItem(creditKey) || 0));
+  const used = Number.isFinite(Number(data.freeAnalysesUsed)) ? Math.min(5, Math.max(0, Number(data.freeAnalysesUsed))) : localUsed;
+  const credits = Number.isFinite(Number(data.paidAnalysesRemaining)) ? Math.max(0, Number(data.paidAnalysesRemaining)) : localCredits;
+  localStorage.setItem(trialKey, String(used));
+  localStorage.setItem(creditKey, String(credits));
+  await setDoc(ref, { freeAnalysesUsed: used, paidAnalysesRemaining: credits, updatedAt: serverTimestamp() }, { merge: true });
+  window.caloriaiUpdateCreditsDisplay?.();
+  return { freeAnalysesUsed: used, paidAnalysesRemaining: credits };
+};
+window.caloriaiSaveCreditsCloud = async () => {
+  const user = auth?.currentUser;
+  if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
+  const used = Math.min(5, Math.max(0, Number(localStorage.getItem("caloriai_trial_photo_analyses_v1") || 0)));
+  const credits = Math.max(0, Number(localStorage.getItem("caloriai_photo_credits_v1") || 0));
+  await setDoc(doc(db, "users", user.uid), { freeAnalysesUsed: used, paidAnalysesRemaining: credits, updatedAt: serverTimestamp() }, { merge: true });
+  return { freeAnalysesUsed: used, paidAnalysesRemaining: credits };
+};
+window.caloriaiSaveWeightCloud = async (entry) => {
+  const user = auth?.currentUser;
+  if (!user || !db) throw new Error("Connectez-vous et activez Cloud Firestore.");
+  await addDoc(collection(db, "users", user.uid, "weightHistory"), {
+    weight: Number(entry.weight),
+    height: entry.height ? Number(entry.height) : null,
+    target: entry.target ? Number(entry.target) : null,
+    date: entry.date,
+    createdAt: serverTimestamp()
+  });
+  await setDoc(doc(db, "users", user.uid), {
+    latestWeight: Number(entry.weight),
+    height: entry.height ? Number(entry.height) : null,
+    targetWeight: entry.target ? Number(entry.target) : null,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+};
+window.caloriaiLoadWeightsCloud = async () => {
+  const user = auth?.currentUser;
+  if (!user || !db) return null;
+  const q = query(collection(db, "users", user.uid, "weightHistory"), orderBy("date", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+};
+
+const onboarding = document.getElementById("onboarding"), appShell = document.getElementById("appShell");
+const genderButtons = [...document.querySelectorAll(".gender-option")];
+let chosenGender = localStorage.getItem("caloriai_gender") || "", auth = null, loginMode = false;
+const langSelect = document.getElementById("onboardingLanguage");
+const appLangSelect = document.getElementById("language");
+const onboardingText = {
+ ar:{subtitle:"اختَر الجنس أولاً لتخصيص ألوان التطبيق",gender:"اختَر الجنس",male:"ذكر",female:"أنثى",next:"متابعة",createTitle:"إنشاء حساب بالبريد الإلكتروني",loginTitle:"تسجيل الدخول",hint:"أنشئ حساباً بالبريد الإلكتروني وكلمة مرور من 6 أحرف على الأقل.",email:"البريد الإلكتروني",pass:"كلمة المرور",confirm:"تأكيد كلمة المرور",create:"إنشاء حساب",login:"تسجيل الدخول",switchLogin:"لدي حساب بالفعل — تسجيل الدخول",switchCreate:"ليس لديك حساب؟ إنشاء حساب",back:"رجوع لاختيار الجنس",setup:"يتطلب تفعيل تسجيل الدخول بالبريد الإلكتروني في Firebase مرة واحدة.",choose:"اختَر الجنس للمتابعة.",mismatch:"كلمتا المرور غير متطابقتين.",success:"تم إنشاء الحساب بنجاح.",badConfig:"يجب أولاً وضع إعدادات Firebase الصحيحة في ملف التطبيق.",errors:{"auth/email-already-in-use":"هذا البريد مسجل بالفعل. سجّل الدخول.","auth/invalid-email":"البريد الإلكتروني غير صالح.","auth/weak-password":"كلمة المرور ضعيفة؛ استخدم 6 أحرف على الأقل.","auth/invalid-credential":"البريد الإلكتروني أو كلمة المرور غير صحيحة.","auth/operation-not-allowed":"فعّل Email/Password من Firebase Authentication.","auth/network-request-failed":"تحقق من اتصال الإنترنت."}},
+ fr:{subtitle:"Choisissez votre sexe pour personnaliser les couleurs",gender:"Choisissez votre sexe",male:"Homme",female:"Femme",next:"Continuer",createTitle:"Créer un compte par e-mail",loginTitle:"Connexion",hint:"Utilisez une adresse e-mail et un mot de passe d’au moins 6 caractères.",email:"Adresse e-mail",pass:"Mot de passe",confirm:"Confirmer le mot de passe",create:"Créer mon compte",login:"Se connecter",switchLogin:"J’ai déjà un compte — Connexion",switchCreate:"Pas encore de compte ? Créer un compte",back:"Retour au choix du sexe",setup:"Activez une seule fois la connexion Email/Password dans Firebase.",choose:"Choisissez un sexe pour continuer.",mismatch:"Les mots de passe ne correspondent pas.",success:"Compte créé avec succès.",badConfig:"Ajoutez d’abord la configuration Firebase dans le fichier.",errors:{"auth/email-already-in-use":"Cette adresse existe déjà. Connectez-vous.","auth/invalid-email":"Adresse e-mail invalide.","auth/weak-password":"Mot de passe trop court : 6 caractères minimum.","auth/invalid-credential":"E-mail ou mot de passe incorrect.","auth/operation-not-allowed":"Activez Email/Password dans Firebase Authentication.","auth/network-request-failed":"Vérifiez votre connexion Internet."}},
+ en:{subtitle:"Choose your gender to personalize the app colors",gender:"Choose your gender",male:"Male",female:"Female",next:"Continue",createTitle:"Create an email account",loginTitle:"Sign in",hint:"Use an email address and a password with at least 6 characters.",email:"Email address",pass:"Password",confirm:"Confirm password",create:"Create account",login:"Sign in",switchLogin:"Already have an account? Sign in",switchCreate:"New here? Create an account",back:"Back to gender selection",setup:"Enable Email/Password sign-in in Firebase once.",choose:"Choose a gender to continue.",mismatch:"The passwords do not match.",success:"Account created successfully.",badConfig:"Add your Firebase configuration to this file first.",errors:{"auth/email-already-in-use":"This email is already registered. Sign in.","auth/invalid-email":"Invalid email address.","auth/weak-password":"Use at least 6 characters for the password.","auth/invalid-credential":"Incorrect email or password.","auth/operation-not-allowed":"Enable Email/Password in Firebase Authentication.","auth/network-request-failed":"Check your internet connection."}}};
+function t(){return onboardingText[langSelect?.value||"ar"]||onboardingText.ar}
+function paintGender(){genderButtons.forEach(b=>{const yes=b.dataset.gender===chosenGender;b.classList.toggle("selected",yes);b.setAttribute("aria-pressed",String(yes))});document.getElementById("continueGender").disabled=!chosenGender;document.body.dataset.gender=chosenGender||"male"}
+function translateOnboarding(){const x=t();if(appLangSelect)appLangSelect.value=langSelect.value;document.getElementById("languageLabel").textContent=langSelect.value==="ar"?"اللغة":langSelect.value==="en"?"Language":"Langue";document.getElementById("onboardSubtitle").textContent=x.subtitle;document.getElementById("genderTitle").textContent=x.gender;document.getElementById("maleLabel").textContent=x.male;document.getElementById("femaleLabel").textContent=x.female;document.getElementById("continueGender").textContent=x.next;document.getElementById("accountTitle").textContent=loginMode?x.loginTitle:x.createTitle;document.getElementById("accountHint").textContent=x.hint;document.getElementById("emailLabel").textContent=x.email;document.getElementById("passwordLabel").textContent=x.pass;document.getElementById("confirmPasswordLabel").textContent=x.confirm;document.getElementById("createAccountButton").textContent=loginMode?x.login:x.create;document.getElementById("showLoginButton").textContent=loginMode?x.switchCreate:x.switchLogin;document.getElementById("backGenderButton").textContent=x.back;document.getElementById("firebaseSetupNote").textContent=x.setup;document.getElementById("accountPasswordConfirm").hidden=loginMode;document.getElementById("confirmPasswordLabel").hidden=loginMode;document.documentElement.lang=langSelect.value;document.documentElement.dir=langSelect.value==="ar"?"rtl":"ltr"}
+paintGender();
+genderButtons.forEach(b=>b.addEventListener("click",()=>{chosenGender=b.dataset.gender;localStorage.setItem("caloriai_gender",chosenGender);paintGender()}));
+document.getElementById("continueGender").addEventListener("click",()=>{if(!chosenGender){document.getElementById("authStatus").textContent=t().choose;return}document.getElementById("genderStep").hidden=true;document.getElementById("accountForm").hidden=false;translateOnboarding()});
+document.getElementById("backGenderButton").addEventListener("click",()=>{document.getElementById("accountForm").hidden=true;document.getElementById("genderStep").hidden=false;document.getElementById("authStatus").textContent=""});
+document.getElementById("showLoginButton").addEventListener("click",()=>{loginMode=!loginMode;document.getElementById("authStatus").textContent="";document.getElementById("accountPasswordConfirm").required=!loginMode;translateOnboarding()});
+langSelect?.addEventListener("change",()=>{translateOnboarding();if(typeof translate==="function" && appLangSelect){appLangSelect.value=langSelect.value;translate()}});
+appLangSelect?.addEventListener("change",()=>{if(langSelect)langSelect.value=appLangSelect.value;translateOnboarding();if(typeof translate==="function")translate()});
+document.getElementById("accountForm").addEventListener("submit",async e=>{e.preventDefault();const status=document.getElementById("authStatus"),email=document.getElementById("accountEmail").value.trim(),password=document.getElementById("accountPassword").value,confirm=document.getElementById("accountPasswordConfirm").value;status.textContent="";if(!loginMode&&password!==confirm){status.textContent=t().mismatch;return}if(!setupDone||!auth){status.textContent=t().badConfig;return}const btn=document.getElementById("createAccountButton");btn.disabled=true;try{let credential;if(loginMode){credential=await signInWithEmailAndPassword(auth,email,password)}else{credential=await createUserWithEmailAndPassword(auth,email,password);await updateProfile(credential.user,{displayName:"gender:"+chosenGender});localStorage.setItem("caloriai_gender",chosenGender);status.textContent=t().success}localStorage.setItem("caloriai_email",credential.user.email||email);localStorage.setItem("caloriai_gender",chosenGender||localStorage.getItem("caloriai_gender")||"male");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"})}catch(cloudErr){console.warn("Profile cloud save failed",cloudErr)}showApp()}catch(err){status.textContent=t().errors?.[err.code]||err.message||"Authentication error"}finally{btn.disabled=false}});
+function showApp(){const g=localStorage.getItem("caloriai_gender")||chosenGender||"male";document.body.dataset.gender=g;onboarding.hidden=true;appShell.hidden=false;setTimeout(()=>window.caloriaiRefreshProfile&&window.caloriaiRefreshProfile(),0)}
+if(langSelect && appLangSelect)appLangSelect.value=langSelect.value;paintGender();translateOnboarding();
+if(setupDone){try{const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);onAuthStateChanged(auth,async user=>{if(user){const display=user.displayName||"";if(display.startsWith("gender:")){chosenGender=display.slice(7);localStorage.setItem("caloriai_gender",chosenGender)}localStorage.setItem("caloriai_email",user.email||"");try{await window.caloriaiSaveProfile({gender:chosenGender||localStorage.getItem("caloriai_gender")||"male"});await window.caloriaiLoadCreditsCloud();}catch(err){console.warn("Cloud profile/credits sync failed; check Firestore rules.",err)}showApp()}else{onboarding.hidden=false;appShell.hidden=true}})}catch(e){console.error("Firebase setup error",e)}}
+</script>
+<script>
+const foods=[
+{fr:"Pomme",ar:"تفاح",en:"Apple",k:52},{fr:"Banane",ar:"موز",en:"Banana",k:89},{fr:"Orange",ar:"برتقال",en:"Orange",k:47},{fr:"Fraise",ar:"فراولة",en:"Strawberry",k:32},{fr:"Datte",ar:"تمر",en:"Date",k:282},{fr:"Avocat",ar:"أفوكادو",en:"Avocado",k:160},{fr:"Riz blanc cuit",ar:"أرز أبيض مطبوخ",en:"Cooked white rice",k:130},{fr:"Pâtes cuites",ar:"معكرونة مطبوخة",en:"Cooked pasta",k:157},{fr:"Pain blanc",ar:"خبز أبيض",en:"White bread",k:266},{fr:"Œuf",ar:"بيض",en:"Egg",k:155},{fr:"Poulet cuit",ar:"دجاج مطبوخ",en:"Cooked chicken",k:165},{fr:"Bœuf cuit",ar:"لحم بقري مطبوخ",en:"Cooked beef",k:250},{fr:"Saumon cuit",ar:"سلمون مطبوخ",en:"Cooked salmon",k:206},{fr:"Lait entier",ar:"حليب كامل الدسم",en:"Whole milk",k:61},{fr:"Yaourt nature",ar:"زبادي طبيعي",en:"Plain yogurt",k:61},{fr:"Amandes",ar:"لوز",en:"Almonds",k:579},{fr:"Avoine sèche",ar:"شوفان جاف",en:"Dry oats",k:389},{fr:"Pomme de terre bouillie",ar:"بطاطس مسلوقة",en:"Boiled potato",k:87},{fr:"Tomate",ar:"طماطم",en:"Tomato",k:18},{fr:"Concombre",ar:"خيار",en:"Cucumber",k:15},{fr:"Carotte",ar:"جزر",en:"Carrot",k:41},{fr:"Lentilles cuites",ar:"عدس مطبوخ",en:"Cooked lentils",k:116},{fr:"Pois chiches cuits",ar:"حمص مطبوخ",en:"Cooked chickpeas",k:164},{fr:"Huile d'olive",ar:"زيت الزيتون",en:"Olive oil",k:884},{fr:"Chocolat noir",ar:"شوكولاتة داكنة",en:"Dark chocolate",k:598}];
+const T={
+fr:{photoTitle:"📸 Photographier un repas",photoDescription:"Prenez une photo de votre plat ou choisissez une image dans votre galerie.",photoLabel:"Photo du repas",gallery:"🖼️ Choisir dans la galerie",camera:"📷 Prendre une photo",analyze:"Analyser la photo",removePhoto:"Retirer la photo",photoReady:"Photo prête. L’estimation automatique des aliments et des calories nécessite de connecter un service d’IA sécurisé.",photoNone:"Aucune photo sélectionnée.",photoNeed:"Choisissez ou prenez d’abord une photo.",analyzing:"Analyse en cours…",analysisFailed:"Échec de l’analyse. Vérifiez la configuration du service IA et réessayez.",analysisEmpty:"L’IA n’a pas identifié d’aliments. Essayez une photo plus nette.",addResult:"Ajouter au journal",addedResult:"Aliment ajouté au journal.",gramsWord:"g estimés",totalCalories:"Calories estimées",subtitle:"Votre nutrition, en toute simplicité",welcome:"Suivi nutritionnel quotidien",cal:"Calories consommées",meals:"Nombre d'aliments",add:"Ajouter un aliment",search:"Rechercher un aliment",grams:"Quantité (g)",cal100:"kcal pour 100 g",calc:"Choisissez un aliment de la liste pour remplir ses calories pour 100 g, ou saisissez une valeur manuellement.",addBtn:"Ajouter à mon journal",manual:"Les valeurs sont des estimations moyennes et varient selon la préparation.",journal:"Mon journal alimentaire",empty:"Aucun aliment ajouté aujourd'hui.",clear:"Effacer le journal du jour",database:"Base d'aliments intégrée",dbNote:"Valeurs indicatives pour 100 g.",privacy:"Les données sont enregistrées localement dans ce navigateur.",remove:"Supprimer",confirm:"Effacer le journal du jour ?",kcal:"kcal",items:"aliments"},
+ar:{photoTitle:"📸 تصوير الوجبة",photoDescription:"التقط صورة لوجبتك أو اختر صورة من معرض الهاتف.",photoLabel:"صورة الوجبة",gallery:"🖼️ اختيار صورة من المعرض",camera:"📷 التقاط صورة بالكاميرا",analyze:"تحليل الصورة",removePhoto:"إزالة الصورة",photoReady:"تم اختيار الصورة. لتحديد الأطعمة والسعرات تلقائيًا، يجب ربط التطبيق بخدمة ذكاء اصطناعي آمنة.",photoNone:"لم يتم اختيار صورة.",photoNeed:"التقط صورة أو اخترها أولًا.",analyzing:"جارٍ تحليل الصورة…",analysisFailed:"فشل التحليل. تحقق من إعداد خدمة الذكاء الاصطناعي ثم أعد المحاولة.",analysisEmpty:"لم يتم التعرف على أطعمة. جرّب صورة أوضح.",addResult:"إضافة إلى السجل",addedResult:"تمت إضافة الطعام إلى السجل.",gramsWord:"غرام تقديري",totalCalories:"السعرات المقدرة",subtitle:"تغذيتك بكل بساطة",welcome:"متابعة التغذية اليومية",cal:"السعرات المستهلكة",meals:"عدد الأطعمة",add:"إضافة طعام",search:"ابحث عن طعام",grams:"الكمية (غرام)",cal100:"السعرات لكل 100 غرام",calc:"اختر طعامًا من القائمة أو أدخل السعرات يدويًا.",addBtn:"أضف إلى سجلي",manual:"القيم تقديرية وقد تختلف حسب طريقة التحضير.",journal:"سجلي الغذائي",empty:"لم تتم إضافة أي طعام اليوم.",clear:"مسح سجل اليوم",database:"قاعدة الأطعمة المدمجة",dbNote:"قيم تقريبية لكل 100 غرام.",privacy:"يُحفظ السجل محليًا في هذا المتصفح.",remove:"حذف",confirm:"هل تريد مسح سجل اليوم؟",kcal:"سعرة",items:"أطعمة"},
+en:{photoTitle:"📸 Photograph a meal",photoDescription:"Take a photo of your meal or choose an image from your gallery.",photoLabel:"Meal photo",gallery:"🖼️ Choose from gallery",camera:"📷 Take a photo",analyze:"Analyze photo",removePhoto:"Remove photo",photoReady:"Photo selected. Automatic food and calorie estimation requires connecting a secure AI service.",photoNone:"No photo selected.",photoNeed:"Take or choose a photo first.",analyzing:"Analyzing image…",analysisFailed:"Analysis failed. Check the AI service configuration and try again.",analysisEmpty:"No foods were identified. Try a clearer photo.",addResult:"Add to journal",addedResult:"Food added to journal.",gramsWord:"estimated g",totalCalories:"Estimated calories",subtitle:"Nutrition made simple",welcome:"Daily nutrition tracking",cal:"Calories consumed",meals:"Food entries",add:"Add a food",search:"Search for a food",grams:"Quantity (g)",cal100:"kcal per 100 g",calc:"Choose a food or enter calories manually.",addBtn:"Add to my journal",manual:"Values are estimates and vary by preparation.",journal:"My food journal",empty:"No foods added today.",clear:"Clear today's journal",database:"Built-in food database",dbNote:"Approximate values per 100 g.",privacy:"Entries are saved locally in this browser.",remove:"Delete",confirm:"Clear today's journal?",kcal:"kcal",items:"foods"}};
+let journal=[];try{journal=JSON.parse(localStorage.getItem("caloriai_journal_v2")||"[]");if(!Array.isArray(journal))journal=[]}catch(e){}
+const $=id=>document.getElementById(id), lang=()=> $("language").value, name=f=>f[lang()]||f.fr;
+let selectedFile=null;
+function renderOptions(){const d=$("foodOptions");d.innerHTML="";foods.forEach(f=>{let o=document.createElement("option");o.value=name(f);d.appendChild(o)});$("databaseSummary").textContent=foods.length+" "+T[lang()].items}
+function findFood(s){s=s.trim().toLowerCase();return foods.find(f=>[f.fr,f.ar,f.en].some(n=>n.toLowerCase()===s))}
+function render(){const t=T[lang()],today=new Date().toISOString().slice(0,10),items=journal.filter(x=>x.date===today);$("total").textContent=Math.round(items.reduce((a,x)=>a+(Number(x.kcal)||0),0)*10)/10;$("count").textContent=items.length;const sum=k=>Math.round(items.reduce((a,x)=>a+(Number(x[k])||0),0)*10)/10;$("proteinTotal").textContent=sum("protein")+" g";$("carbTotal").textContent=sum("carbs")+" g";$("fatTotal").textContent=sum("fat")+" g";$("journal").innerHTML="";$("empty").style.display=items.length?"none":"block";items.forEach(x=>{let li=document.createElement("li"),title=document.createElement("div"),detail=document.createElement("div"),b=document.createElement("button");title.className="food-title";title.textContent=x.name;detail.className="food-detail";detail.textContent=x.grams+" g · "+x.kcal+" "+t.kcal+" · P "+(Number(x.protein)||0)+" g · C "+(Number(x.carbs)||0)+" g · F "+(Number(x.fat)||0)+" g";b.className="danger";b.textContent=t.remove;b.onclick=()=>{journal=journal.filter(y=>y.id!==x.id);save();render()};li.append(title,detail,b);$("journal").appendChild(li)})}
+function save(){localStorage.setItem("caloriai_journal_v2",JSON.stringify(journal))}
+function translate(){let l=lang(),t=T[l];document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";$("photoTitle").textContent=t.photoTitle;$("photoDescription").textContent=t.photoDescription;$("photoLabel").textContent=t.photoLabel;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("galleryButton").textContent=t.gallery;$("cameraButton").textContent=t.camera;$("analyzePhotoButton").textContent=t.analyze;$("removePhotoButton").textContent=t.removePhoto;if(!selectedFile)$("photoStatus").textContent=t.photoNone;const map={subtitle:"subtitle",welcome:"welcome",cal:"calLabel",meals:"mealLabel",add:"addTitle",search:"searchLabel",grams:"gramsLabel",cal100:"cal100Label",calc:"calcNote",addBtn:"addButton",manual:"manualNote",journal:"journalTitle",empty:"empty",clear:"clearButton",database:"databaseTitle",dbNote:"databaseNote",privacy:"privacyNote"};Object.entries(map).forEach(([k,id])=>$(id).textContent=t[k]);$("foodSearch").placeholder=l==="ar"?"مثال: تفاح، بيض، أرز":l==="en"?"e.g. apple, egg, rice":"Ex. : pomme, œuf, riz";renderOptions();render()}
+$("language").onchange=translate;$("foodSearch").oninput=()=>{let f=findFood($("foodSearch").value);if(f){$("calories100").value=f.k;$("manualProtein").value=Number(f.p)||0;$("manualCarbs").value=Number(f.c)||0;$("manualFat").value=Number(f.f)||0}};
+$("addButton").onclick=()=>{let n=$("foodSearch").value.trim(),g=Number($("grams").value),k=Number($("calories100").value),p=Number($("manualProtein").value),c=Number($("manualCarbs").value),f=Number($("manualFat").value);if(!n||g<=0||!Number.isFinite(g)||k<0||!Number.isFinite(k)||![p,c,f].every(v=>Number.isFinite(v)&&v>=0)){alert("Please enter valid food, quantity, calories and macros.");return}let food=findFood(n),factor=g/100;journal.unshift({id:Date.now(),name:food?name(food):n,grams:g,kcal:Math.round(k*factor*10)/10,protein:Math.round(p*factor*10)/10,carbs:Math.round(c*factor*10)/10,fat:Math.round(f*factor*10)/10,date:new Date().toISOString().slice(0,10)});save();render();$("foodSearch").value="";$("calories100").value="";$("manualProtein").value=0;$("manualCarbs").value=0;$("manualFat").value=0;$("grams").value=100};
+$("clearButton").onclick=()=>{if(confirm(T[lang()].confirm)){let today=new Date().toISOString().slice(0,10);journal=journal.filter(x=>x.date!==today);save();render()}};let selectedPhotoUrl=null;
+$("galleryButton").addEventListener("click",()=>$("foodPhoto").click());
+$("cameraButton").addEventListener("click",()=>$("cameraPhoto").click());
+function handlePhotoChange(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  if(!file.type.startsWith("image/")){alert("Please choose an image.");event.target.value="";return}
+  selectedFile=file;
+  if(selectedPhotoUrl)URL.revokeObjectURL(selectedPhotoUrl);
+  selectedPhotoUrl=URL.createObjectURL(file);
+  $("photoPreview").src=selectedPhotoUrl;
+  $("photoPreview").style.display="block";
+  $("photoStatus").textContent=T[lang()].photoReady;
+  // Reset the other input so the same photo can be selected again later.
+  if(event.target.id==="foodPhoto")$("cameraPhoto").value="";
+  else $("foodPhoto").value="";
+}
+$("foodPhoto").addEventListener("change",handlePhotoChange);
+$("cameraPhoto").addEventListener("change",handlePhotoChange);
+$("analyzePhotoButton").addEventListener("click", async ()=>{
+  const file=selectedFile, t=T[lang()];
+  if(!file){$("photoStatus").textContent=t.photoNeed;return}
+  const trialKey="caloriai_trial_photo_analyses_v1";
+  const used=Number(localStorage.getItem(trialKey)||0);
+  const creditKey="caloriai_photo_credits_v1";
+  const credits=Number(localStorage.getItem(creditKey)||0);
+  const trialRemaining=Math.max(0,5-used);
+  if(trialRemaining<=0 && credits<=0){
+    $("photoStatus").textContent=lang()==="ar"?"انتهت الصور التجريبية. اختر باقة تحليلات للمتابعة.":lang()==="en"?"Free trial used. Choose an analysis pack to continue.":"Essai gratuit terminé. Choisissez un pack d’analyses pour continuer.";
+    $("subscriptionCard").scrollIntoView({behavior:"smooth",block:"center"}); return;
+  }
+  const button=$("analyzePhotoButton");
+  button.disabled=true;button.style.opacity=".65";
+  $("analysisResults").style.display="none";$("analysisResults").innerHTML="";
+  $("photoStatus").textContent=t.analyzing;
+  try{
+    const dataUrl=await new Promise((resolve,reject)=>{
+      const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error("Could not read image"));reader.readAsDataURL(file);
+    });
+    const response=await fetch("https://caloriai-photo-api.ayhamimarati-c54.workers.dev",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({image:dataUrl,mimeType:file.type,language:lang()})
+    });
+    const payload=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(payload.error||payload.message||("HTTP "+response.status));
+    const items=Array.isArray(payload.foods)?payload.foods:(Array.isArray(payload.items)?payload.items:[]);
+    if(!items.length)throw new Error("NO_FOODS");
+    if(used<5){localStorage.setItem(trialKey,String(used+1));}
+    else {localStorage.setItem(creditKey,String(Math.max(0,credits-1)));}
+    try { if(window.caloriaiSaveCreditsCloud) await window.caloriaiSaveCreditsCloud(); }
+    catch(cloudErr) { console.error("Could not save analysis credits to Firebase:", cloudErr); }
+    const counter=$("trialCounter");
+    const updatedTrial=Math.min(5,used+(used<5?1:0));
+    const updatedCredits=Number(localStorage.getItem(creditKey)||0);
+    if(counter) counter.textContent=lang()==="ar"?`التجربة: ${updatedTrial}/5 صور · الرصيد المدفوع: ${updatedCredits} تحليل.`:lang()==="en"?`Free trial: ${updatedTrial}/5 photos · Paid analyses remaining: ${updatedCredits}.`:`Essai : ${updatedTrial}/5 photos · Analyses payantes restantes : ${updatedCredits}.`;
+    const box=$("analysisResults");box.style.display="block";
+    const heading=document.createElement("h3");heading.textContent=t.totalCalories;box.appendChild(heading);
+    items.forEach((food,index)=>{
+      const grams=Math.max(1,Math.round(Number(food.estimated_grams??food.grams??100)));
+      const kcal=Math.max(0,Math.round(Number(food.calories_kcal??food.calories??0)));
+      const nm=String(food.name||food.food||"Food "+(index+1));
+      const row=document.createElement("div");row.className="card";row.style.padding="14px";row.style.margin="10px 0";
+      const title=document.createElement("strong");title.textContent=nm;
+      const detail=document.createElement("p");detail.className="food-detail";detail.textContent=grams+" "+t.gramsWord+" · "+kcal+" "+t.kcal;
+      const editLabel=document.createElement("label");editLabel.textContent=lang()==="ar"?"الكمية (غرام)":lang()==="en"?"Quantity (g)":"Quantité (g)";
+      const gramsInput=document.createElement("input");gramsInput.type="number";gramsInput.min="1";gramsInput.value=grams;
+      const calLabel=document.createElement("label");calLabel.textContent=lang()==="ar"?"السعرات الإجمالية":"Total kcal";
+      const kcalInput=document.createElement("input");kcalInput.type="number";kcalInput.min="0";kcalInput.value=kcal;
+      const macroInputs=[{key:"protein",label:lang()==="ar"?"البروتينات (غرام)":lang()==="en"?"Protein (g)":"Protéines (g)",value:food.protein_g??food.protein??food.proteins_g??0},{key:"carbs",label:lang()==="ar"?"الكربوهيدرات (غرام)":lang()==="en"?"Carbs (g)":"Glucides (g)",value:food.carbs_g??food.carbohydrates_g??food.carbs??food.carbohydrates??0},{key:"fat",label:lang()==="ar"?"الدهون (غرام)":lang()==="en"?"Fat (g)":"Lipides (g)",value:food.fat_g??food.fats_g??food.fat??food.lipids_g??food.lipids??0}].map(m=>{const l=document.createElement("label");l.textContent=m.label;const input=document.createElement("input");input.type="number";input.min="0";input.step="0.1";input.value=Math.max(0,Number(m.value)||0);return {key:m.key,label:l,input}});
+      const add=document.createElement("button");add.textContent=t.addResult;
+      add.onclick=()=>{
+        const g=Number(gramsInput.value),c=Number(kcalInput.value),macros={};macroInputs.forEach(m=>macros[m.key]=Number(m.input.value));
+        if(!g||g<1||!Number.isFinite(c)||c<0||macroInputs.some(m=>!Number.isFinite(Number(m.input.value))||Number(m.input.value)<0))return;
+        journal.unshift({id:Date.now()+index,name:nm,grams:g,kcal:Math.round(c*10)/10,...macros,date:new Date().toISOString().slice(0,10)});
+        save();render();add.textContent=t.addedResult;add.disabled=true;
+      };
+      row.append(title,detail,editLabel,gramsInput,calLabel,kcalInput,...macroInputs.flatMap(m=>[m.label,m.input]),add);box.appendChild(row);
+    });
+    $("photoStatus").textContent=lang()==="ar"?"تم تحليل الصورة. راجع الكميات والسعرات قبل الإضافة.":lang()==="en"?"Image analyzed. Review quantities and calories before adding.":"Photo analysée. Vérifiez les quantités et calories avant l’ajout.";
+  }catch(err){
+    console.error("CaloriAI photo analysis:",err);
+    $("photoStatus").textContent=err.message==="NO_FOODS"?t.analysisEmpty:(t.analysisFailed+" ("+String(err.message||"").slice(0,160)+")");
+  }finally{button.disabled=false;button.style.opacity="1"}
+});
+(function setupSubscriptionUI(){
+  const trialKey="caloriai_trial_photo_analyses_v1";
+  const creditKey="caloriai_photo_credits_v1";
+  window.caloriaiUpdateCreditsDisplay=function(){
+    const used=Math.min(5,Math.max(0,Number(localStorage.getItem(trialKey)||0)));
+    const credits=Math.max(0,Number(localStorage.getItem(creditKey)||0));
+    const counter=document.getElementById("trialCounter");
+    if(counter) counter.textContent=lang()==="ar"?`الصور المجانية المستخدمة: ${used}/5 · التحليلات المدفوعة المتبقية: ${credits}.`:lang()==="en"?`Free photos used: ${used}/5 · Paid analyses remaining: ${credits}.`:`Photos gratuites utilisées : ${used}/5 · Analyses payantes restantes : ${credits}.`;
+  };
+  window.caloriaiUpdateCreditsDisplay();
+  const note=document.getElementById("paymentSetupNote");
+  function paymentNotConfigured(e){
+    const credits=e.currentTarget.dataset.credits, price=e.currentTarget.dataset.price;
+    if(note) note.textContent=lang()==="ar"?`اخترت باقة ${credits} تحليل بسعر ${price}. الدفع لم يُفعّل بعد؛ يجب ربط هذا الزر بمزود دفع والتحقق من الدفع على الخادم قبل إضافة الرصيد.`:lang()==="en"?`You selected ${credits} analyses for ${price}. Payments are not enabled yet. Connect a payment provider and verify payment server-side before adding credits.`:`Vous avez choisi ${credits} analyses à ${price}. Le paiement n’est pas encore activé : reliez un prestataire de paiement et vérifiez le paiement côté serveur avant d’ajouter les crédits.`;
+    note.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  document.querySelectorAll(".creditPackButton").forEach(button=>button.addEventListener("click",paymentNotConfigured));
+})();
+$("removePhotoButton").addEventListener("click",()=>{
+  if(selectedPhotoUrl){URL.revokeObjectURL(selectedPhotoUrl);selectedPhotoUrl=null}
+  selectedFile=null;$("foodPhoto").value="";$("cameraPhoto").value="";$("photoPreview").removeAttribute("src");$("photoPreview").style.display="none";$("photoStatus").textContent=T[lang()].photoNone;
+});
+translate();
+</script>
+<script>
+(function(){
+  const byId = id => document.getElementById(id);
+  const dashboardText = {
+    ar:{remaining:"سعرة متبقية",goal:"الهدف: 2 000 سعرة",protein:"البروتينات",carbs:"الكربوهيدرات",fat:"الدهون",add:"إضافة وجبة",addSub:"صوّر الطعام أو اختره",journal:"التقدم",journalSub:"راجع سجل الطعام",goalTitle:"الهدف اليومي",goalSub:"تابع هدفك اليومي",home:"الرئيسية",navAdd:"إضافة",weight:"الوزن",profile:"الملف الشخصي"},
+    fr:{remaining:"kcal restantes",goal:"Objectif : 2 000 kcal",protein:"Protéines",carbs:"Glucides",fat:"Lipides",add:"Ajouter un repas",addSub:"Photographier ou choisir un aliment",journal:"Progression",journalSub:"Consulter votre journal alimentaire",goalTitle:"Objectif",goalSub:"Suivre votre objectif quotidien",home:"Accueil",navAdd:"Ajouter",weight:"Poids",profile:"Profil"},
+    en:{remaining:"kcal remaining",goal:"Goal: 2,000 kcal",protein:"Proteins",carbs:"Carbs",fat:"Fats",add:"Add a meal",addSub:"Take a photo or choose food",journal:"Progress",journalSub:"Review your food journal",goalTitle:"Daily goal",goalSub:"Track your daily goal",home:"Home",navAdd:"Add",weight:"Weight",profile:"Profile"}
+  };
+  function updateDashboardLabels(){
+    const lang = (byId("language") && byId("language").value) || (byId("onboardingLanguage") && byId("onboardingLanguage").value) || "fr";
+    const x = dashboardText[lang] || dashboardText.fr;
+    const pairs = {
+      remainingLabel:x.remaining,goalLabel:x.goal,proteinLabel:x.protein,carbLabel:x.carbs,fatLabel:x.fat,
+      quickAddTitle:x.add,quickAddSub:x.addSub,quickJournalTitle:x.journal,quickJournalSub:x.journalSub,
+      quickGoalTitle:x.goalTitle,quickGoalSub:x.goalSub,navHome:x.home,navAdd:x.navAdd,navWeight:x.weight,navProfile:x.profile
+    };
+    Object.keys(pairs).forEach(id=>{if(byId(id))byId(id).textContent=pairs[id]});
+  }
+  function updateProgress(){
+    if(!byId("total")||!byId("calorieProgress"))return;
+    const consumed=Number(String(byId("total").textContent).replace(",", "."))||0;
+    const goal=2000;
+    const remaining=Math.max(0,Math.round(goal-consumed));
+    byId("remainingCalories").textContent=remaining.toLocaleString((byId("language")?.value==="ar")?"ar-MA":"en-US");
+    byId("calorieProgress").style.width=Math.min(100,consumed/goal*100)+"%";
+  }
+  function showAppView(view){
+    const main=byId("appShell")?.querySelector("main");
+    if(!main) return;
+    const children=Array.from(main.children);
+    children.forEach((child,index)=>{
+      // Home: dashboard and daily goal summary only.
+      // Add: meal photo, manual food entry and food journal.
+      // Weight/Profile: their own dedicated screens only.
+      let show=false;
+      if(view==="dashboardHome") show=(child.id==="dashboardHome" || (byId("databaseTitle") && child.contains(byId("databaseTitle"))) || child.id==="privacyNote");
+      else if(view==="addView") show=(index===1 || index===2 || index===3 || child.id==="privacyNote");
+      else if(view==="weightSection") show=(child===byId("weightSection") || child.id==="privacyNote");
+      else if(view==="profileSection") show=(child===byId("profileSection") || child.id==="privacyNote");
+      child.hidden=!show;
+    });
+    document.querySelectorAll(".nav-item").forEach(n=>{
+      const target=n.getAttribute("data-target");
+      n.classList.toggle("active", target===view || (view==="addView" && target==="photoTitle"));
+    });
+  }
+  document.querySelectorAll("#appShell [data-target]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const id=button.getAttribute("data-target");
+      const target=byId(id);
+      if(button.classList.contains("nav-item")){
+        showAppView(id==="photoTitle" ? "addView" : id);
+      } else if(id==="photoTitle" || id==="journalTitle") {
+        showAppView("addView");
+      } else if(id==="databaseTitle") {
+        showAppView("dashboardHome");
+      }
+      if(target){target.scrollIntoView({behavior:"smooth",block:"start"});}
+    });
+  });
+  // Start with the Home screen, keeping Weight and Profile out of Home/Add.
+  showAppView("dashboardHome");
+  const originalRender=window.render;
+  if(typeof originalRender==="function"){
+    window.render=function(){originalRender();updateProgress();updateDashboardLabels()};
+  }
+  ["language","onboardingLanguage"].forEach(id=>byId(id)?.addEventListener("change",()=>{updateDashboardLabels();updateProgress()}));
+  const observer=new MutationObserver(updateProgress);
+  if(byId("total"))observer.observe(byId("total"),{childList:true,characterData:true,subtree:true});
+  updateDashboardLabels();updateProgress();
+})();
+</script>
+
+
+<script>
+(function(){
+ const $ = id => document.getElementById(id);
+ const translations = {
+  fr:{
+   weightTitle:"⚖️ Poids et évolution",weightIntro:"Enregistrez votre poids pour suivre votre évolution.",currentWeight:"Poids actuel (kg)",height:"Taille (cm)",targetWeight:"Poids cible (kg)",saveWeight:"Enregistrer les informations",latestWeight:"Dernier poids",bmi:"IMC indicatif",weightHistory:"Historique du poids",weightSaved:"Informations de poids enregistrées dans votre compte cloud.",weightNeed:"Saisissez au moins votre poids actuel.",profileTitle:"⚙️ Profil et compte",profileDesc:"Informations de votre compte connecté.",email:"Adresse e-mail",gender:"Sexe choisi",male:"Homme",female:"Femme",reset:"Mot de passe oublié ? Recevoir un lien par e-mail",resetSent:"Si cette adresse correspond à un compte, un e-mail de réinitialisation a été envoyé.",changeTitle:"Changer le mot de passe",currentPass:"Mot de passe actuel",newPass:"Nouveau mot de passe (6 caractères minimum)",confirmPass:"Confirmer le nouveau mot de passe",change:"Changer le mot de passe",passChanged:"Mot de passe modifié avec succès.",passMismatch:"Les nouveaux mots de passe ne correspondent pas.",passShort:"Le nouveau mot de passe doit contenir au moins 6 caractères.",signOut:"Se déconnecter",signedOut:"Déconnexion en cours…",needLogin:"Veuillez vous reconnecter pour modifier votre mot de passe.",weightEmpty:"Aucun poids enregistré pour le moment.",kg:"kg"
+  },
+  ar:{
+   weightTitle:"⚖️ الوزن وتطوره",weightIntro:"سجّل وزنك لتتبع التغيّر مع الوقت.",currentWeight:"الوزن الحالي (كغ)",height:"الطول (سم)",targetWeight:"الوزن المستهدف (كغ)",saveWeight:"حفظ معلومات الوزن",latestWeight:"آخر وزن مسجل",bmi:"مؤشر كتلة الجسم التقريبي",weightHistory:"سجل الأوزان",weightSaved:"تم حفظ معلومات الوزن في حسابك السحابي.",weightNeed:"أدخل الوزن الحالي على الأقل.",profileTitle:"⚙️ الملف الشخصي والحساب",profileDesc:"معلومات الحساب المتصل.",email:"البريد الإلكتروني",gender:"الجنس المختار",male:"ذكر",female:"أنثى",reset:"نسيت كلمة المرور؟ أرسل رابط الاستعادة إلى البريد",resetSent:"إذا كان البريد مرتبطاً بحساب، فستصلك رسالة لإعادة تعيين كلمة المرور.",changeTitle:"تغيير كلمة المرور",currentPass:"كلمة المرور الحالية",newPass:"كلمة المرور الجديدة (6 أحرف على الأقل)",confirmPass:"تأكيد كلمة المرور الجديدة",change:"تغيير كلمة المرور",passChanged:"تم تغيير كلمة المرور بنجاح.",passMismatch:"كلمتا المرور الجديدتان غير متطابقتين.",passShort:"يجب أن تتكون كلمة المرور الجديدة من 6 أحرف على الأقل.",signOut:"تسجيل الخروج",signedOut:"جارٍ تسجيل الخروج…",needLogin:"يرجى تسجيل الدخول من جديد قبل تغيير كلمة المرور.",weightEmpty:"لا توجد أوزان مسجلة حتى الآن.",kg:"كغ"
+  },
+  en:{
+   weightTitle:"⚖️ Weight and progress",weightIntro:"Record your weight to track changes over time.",currentWeight:"Current weight (kg)",height:"Height (cm)",targetWeight:"Target weight (kg)",saveWeight:"Save weight information",latestWeight:"Latest weight",bmi:"Estimated BMI",weightHistory:"Weight history",weightSaved:"Weight information saved to your cloud account.",weightNeed:"Enter at least your current weight.",profileTitle:"⚙️ Profile and account",profileDesc:"Information for your signed-in account.",email:"Email address",gender:"Selected gender",male:"Male",female:"Female",reset:"Forgot password? Email me a reset link",resetSent:"If this email belongs to an account, a password reset email has been sent.",changeTitle:"Change password",currentPass:"Current password",newPass:"New password (at least 6 characters)",confirmPass:"Confirm new password",change:"Change password",passChanged:"Password changed successfully.",passMismatch:"The new passwords do not match.",passShort:"The new password must be at least 6 characters.",signOut:"Sign out",signedOut:"Signing out…",needLogin:"Please sign in again before changing your password.",weightEmpty:"No weight records yet.",kg:"kg"
+  }
+ };
+ function currentLang(){return ($("language")&&$("language").value)||"fr"}
+ function tr(){return translations[currentLang()]||translations.fr}
+ function translateProfileWeight(){
+  const t=tr(), map={weightSectionTitle:"weightTitle",weightIntro:"weightIntro",currentWeightLabel:"currentWeight",heightLabel:"height",targetWeightLabel:"targetWeight",saveWeightButton:"saveWeight",latestWeightLabel:"latestWeight",bmiLabel:"bmi",weightHistoryTitle:"weightHistory",profileTitle:"profileTitle",profileDescription:"profileDesc",profileEmailLabel:"email",profileGenderLabel:"gender",resetPasswordButton:"reset",changePasswordTitle:"changeTitle",currentPasswordLabel:"currentPass",newPasswordLabel:"newPass",confirmNewPasswordLabel:"confirmPass",changePasswordButton:"change",signOutButton:"signOut"};
+  Object.keys(map).forEach(id=>{if($(id))$(id).textContent=t[map[id]]});
+  updateAccountDetails();renderWeightHistory();
+ }
+ function updateAccountDetails(){
+  const user=window.caloriaiCurrentUser?window.caloriaiCurrentUser():null;
+  if($("profileEmailValue"))$("profileEmailValue").textContent=(user&&user.email)||localStorage.getItem("caloriai_email")||"—";
+  const g=localStorage.getItem("caloriai_gender")||"";
+  if($("profileGenderValue"))$("profileGenderValue").textContent=g?(g==="female"?tr().female:tr().male):"—";
+ }
+ let cloudWeights = null;
+ function getWeights(){try{return cloudWeights || JSON.parse(localStorage.getItem("caloriai_weight_history_v1")||"[]")}catch(e){return []}}
+ function renderWeightHistory(){
+  if(!$("weightHistory"))return;
+  const list=getWeights(),t=tr();$("weightHistory").innerHTML="";
+  if(!list.length){const li=document.createElement("li");li.textContent=t.weightEmpty;$("weightHistory").appendChild(li);return}
+  list.slice().reverse().forEach(item=>{const li=document.createElement("li");let date=item.date||"";li.textContent=date+" — "+item.weight+" "+t.kg+(item.target?" · "+t.targetWeight+": "+item.target+" "+t.kg:"");$("weightHistory").appendChild(li)});
+ }
+ async function loadLatestWeight(){
+  try{
+   if(window.caloriaiLoadWeightsCloud){
+    const remote=await window.caloriaiLoadWeightsCloud();
+    if(remote){cloudWeights=remote;localStorage.setItem("caloriai_weight_history_v1",JSON.stringify(remote));}
+   }
+  }catch(e){console.warn("Could not load cloud weight history. Check Firestore setup/rules.",e)}
+  const list=getWeights(),latest=list[list.length-1];
+  if(latest){$("currentWeight").value=latest.weight;$("userHeight").value=latest.height||"";$("targetWeight").value=latest.target||"";$("latestWeightValue").textContent=latest.weight+" "+tr().kg;calcBMI(latest.weight,latest.height)}
+  else{ $("latestWeightValue").textContent="— "+tr().kg; $("bmiValue").textContent="—"; }
+  renderWeightHistory();
+ }
+ function calcBMI(weight,height){
+  const h=Number(height)/100,bmi=Number(weight)/(h*h);
+  $("bmiValue").textContent=(weight&&height&&h>0?bmi.toFixed(1):"—");
+ }
+ $("saveWeightButton")?.addEventListener("click",async()=>{
+  const weight=Number($("currentWeight").value),height=Number($("userHeight").value)||null,target=Number($("targetWeight").value)||null;
+  if(!weight||weight<20||weight>400){$("weightStatus").textContent=tr().weightNeed;return}
+  const today=new Date().toISOString().slice(0,10),entry={weight,height,target,date:today};
+  const button=$("saveWeightButton");button.disabled=true;
+  try{
+   if(!window.caloriaiCurrentUser || !window.caloriaiCurrentUser()) throw new Error("Please sign in to save your data to the cloud.");
+   await window.caloriaiSaveWeightCloud(entry);
+   cloudWeights=null;
+   const remote=await window.caloriaiLoadWeightsCloud();if(remote)cloudWeights=remote;
+   localStorage.setItem("caloriai_weight_history_v1",JSON.stringify(getWeights()));
+   $("weightStatus").textContent=tr().weightSaved+" ☁️";
+  }catch(e){
+   $("weightStatus").textContent=(currentLang()==="ar"?"تعذر الحفظ السحابي. تأكد من تفعيل Firestore وقواعد الأمان ثم أعد المحاولة.":currentLang()==="en"?"Cloud save failed. Check Firestore setup and security rules, then try again.":"Échec de la sauvegarde cloud. Vérifiez Firestore et ses règles de sécurité, puis réessayez.");
+   console.error("Weight cloud save failed",e);button.disabled=false;return;
+  }
+  $("latestWeightValue").textContent=weight+" "+tr().kg;calcBMI(weight,height);renderWeightHistory();button.disabled=false;
+ });
+ $("resetPasswordButton")?.addEventListener("click",async()=>{
+  const user=window.caloriaiCurrentUser?window.caloriaiCurrentUser():null;
+  const email=(user&&user.email)||localStorage.getItem("caloriai_email")||"";
+  $("resetPasswordStatus").textContent="";
+  if(!email){$("resetPasswordStatus").textContent=tr().email+": —";return}
+  try{await window.caloriaiResetPassword(email);$("resetPasswordStatus").textContent=tr().resetSent}
+  catch(e){$("resetPasswordStatus").textContent=(e.code==="auth/too-many-requests"?"Too many attempts. Try again later.":e.message||"Error")}
+ });
+ $("changePasswordButton")?.addEventListener("click",async()=>{
+  const current=$("profileCurrentPassword").value,newPass=$("profileNewPassword").value,confirm=$("profileConfirmNewPassword").value;
+  $("changePasswordStatus").textContent="";
+  if(newPass.length<6){$("changePasswordStatus").textContent=tr().passShort;return}
+  if(newPass!==confirm){$("changePasswordStatus").textContent=tr().passMismatch;return}
+  try{await window.caloriaiChangePassword(current,newPass);$("changePasswordStatus").textContent=tr().passChanged;$("profileCurrentPassword").value="";$("profileNewPassword").value="";$("profileConfirmNewPassword").value=""}
+  catch(e){$("changePasswordStatus").textContent=(e.code==="auth/requires-recent-login"?tr().needLogin:(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential"?"Mot de passe actuel incorrect / Current password incorrect":e.message||"Error"))}
+ });
+ $("signOutButton")?.addEventListener("click",async()=>{try{if(window.caloriaiSignOut)await window.caloriaiSignOut()}catch(e){console.error(e)}});
+ $("language")?.addEventListener("change",translateProfileWeight);
+ document.querySelectorAll('.bottom-nav .nav-item').forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll('.bottom-nav .nav-item').forEach(b=>b.classList.toggle("active",b===btn));
+ }));
+ const originalShowApp=window.showApp;
+ // Firebase module calls this hook whenever auth changes and the app is shown.
+ window.caloriaiRefreshProfile=async()=>{
+  updateAccountDetails();translateProfileWeight();await loadLatestWeight();
+  try{
+   if(window.caloriaiLoadProfile){
+    const profile=await window.caloriaiLoadProfile();
+    if(profile){
+     if(profile.gender){localStorage.setItem("caloriai_gender",profile.gender);document.body.dataset.gender=profile.gender;}
+     if(profile.latestWeight && !$("currentWeight").value)$("currentWeight").value=profile.latestWeight;
+     if(profile.height && !$("userHeight").value)$("userHeight").value=profile.height;
+     if(profile.targetWeight && !$("targetWeight").value)$("targetWeight").value=profile.targetWeight;
+     updateAccountDetails();
+    }
+   }
+  }catch(e){console.warn("Cloud profile load failed",e)}
+ };
+ const observer=new MutationObserver(()=>{if($("appShell")&&!$("appShell").hidden){updateAccountDetails();}});
+ if($("appShell"))observer.observe($("appShell"),{attributes:true,attributeFilter:["hidden"]});
+ translateProfileWeight();loadLatestWeight();
+})();
+</script>
+
+</body></html>
